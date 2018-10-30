@@ -18,6 +18,8 @@ sourceSets {
 }
 
 dependencies {
+    compile 'com.google.apis:google-api-services-youtube:v3-rev206-1.25.0'
+
     compile 'com.google.guava:guava:27.0-jre'
 
     compile 'org.apache.commons:commons-lang3:3.8.1'
