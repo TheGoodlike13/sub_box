@@ -1,7 +1,7 @@
 package eu.goodlike.youtube;
 
+import eu.goodlike.search.Result;
 import eu.goodlike.search.Search;
-import eu.goodlike.search.SearchResult;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -23,11 +23,18 @@ public class YoutubeChannelSearchTest {
     }
 
     @Test
+    public void noSearchResults() {
+        List<Result> searchResults = search.doSearch("definitely produces no results", 1);
+
+        assertThat(searchResults).isNotNull().isEmpty();
+    }
+
+    @Test
     @Disabled
     public void performYoutubeSearch() {
 //        SearchResult result = new YoutubeChannel(channelName, channelId);
 
-        List<SearchResult> searchResults = search.doSearch("let's code", 1);
+        List<Result> searchResults = search.doSearch("let's code", 1);
 
         assertThat(searchResults).isNotNull()
                 .containsExactly();

@@ -1,10 +1,13 @@
 package eu.goodlike.youtube;
 
-import eu.goodlike.search.SearchResult;
+import com.google.api.services.youtube.model.SearchResult;
+import eu.goodlike.search.Result;
+import eu.goodlike.util.Require;
 import okhttp3.HttpUrl;
-import org.apache.commons.lang3.StringUtils;
 
-public final class YoutubeChannel implements SearchResult {
+import static eu.goodlike.util.Require.titled;
+
+public final class YoutubeChannel implements Result {
 
     @Override
     public String getTitle() {
@@ -16,19 +19,16 @@ public final class YoutubeChannel implements SearchResult {
         return null;
     }
 
-    public YoutubeChannel(String channelName, String channelId) {
-        if (StringUtils.isBlank(channelName)) {
-            throw new IllegalArgumentException("Cannot be blank: channelName");
-        }
-        if (StringUtils.isBlank(channelId)) {
-            throw new IllegalArgumentException("Cannot be blank: channelId");
-        }
-
-        this.channelName = channelName;
-        this.channelId = channelId;
+    public YoutubeChannel(SearchResult searchResult) {
+        this.searchResult = Require.notNull(searchResult, titled("searchResult"));
+        assertResponsePopulated();
     }
 
-    private final String channelName;
-    private final String channelId;
+    private final SearchResult searchResult;
+
+    private void assertResponsePopulated() {
+        Require.notBlank(searchResult.getSnippet().getChannelId(), titled("channelId"));
+        Require.notBlank(searchResult.getSnippet().getChannelTitle(), titled("channelTitle"));
+    }
 
 }

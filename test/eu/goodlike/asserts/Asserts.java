@@ -1,6 +1,6 @@
 package eu.goodlike.asserts;
 
-import eu.goodlike.util.ThrowingConsumer;
+import org.junit.jupiter.api.function.ThrowingConsumer;
 
 import java.util.Arrays;
 import java.util.List;
@@ -9,19 +9,13 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public final class Asserts {
 
-    public static void assertInvalidNull(String inputName, ThrowingConsumer<?> nullAverseConsumer) {
-        assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> nullAverseConsumer.accept(null))
-                .withMessageContaining(inputName)
-                .withMessageContaining("null");
+    public static void assertInvalidNull(String inputName, ThrowingConsumer<?> consumerForNull) {
+        assertInvalid("null", null, inputName, consumerForNull);
     }
 
-    public static void assertInvalidBlank(String inputName, ThrowingConsumer<String> blankAverseConsumer) {
+    public static void assertInvalidBlank(String inputName, ThrowingConsumer<String> consumerForBlankStrings) {
         for (String blankString : BLANK_STRINGS) {
-            assertThatExceptionOfType(IllegalArgumentException.class)
-                    .isThrownBy(() -> blankAverseConsumer.accept(blankString))
-                    .withMessageContaining(inputName)
-                    .withMessageContaining("blank");
+            assertInvalid("blank", blankString, inputName, consumerForBlankStrings);
         }
     }
 
@@ -30,5 +24,12 @@ public final class Asserts {
     }
 
     private static final List<String> BLANK_STRINGS = Arrays.asList(null, "", " ");
+
+    private static <T> void assertInvalid(String invalidity, T invalidInput, String inputName, ThrowingConsumer<T> consumerForInvalidInputs) {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> consumerForInvalidInputs.accept(invalidInput))
+                .withMessageContaining(inputName)
+                .withMessageContaining(invalidity);
+    }
 
 }

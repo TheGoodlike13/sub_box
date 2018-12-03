@@ -2,7 +2,7 @@ package eu.goodlike.search;
 
 import okhttp3.HttpUrl;
 
-public interface SearchResult {
+public interface Result {
 
     String getTitle();
 
