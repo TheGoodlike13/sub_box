@@ -9,7 +9,7 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public final class Asserts {
 
-    public static void assertInvalidNull(String inputName, ThrowingConsumer<?> consumerForNull) {
+    public static <T> void assertInvalidNull(String inputName, ThrowingConsumer<T> consumerForNull) {
         assertInvalid("null", null, inputName, consumerForNull);
     }
 

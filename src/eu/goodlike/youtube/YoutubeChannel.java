@@ -11,12 +11,12 @@ public final class YoutubeChannel implements Result {
 
     @Override
     public String getTitle() {
-        return null;
+        return getChannelTitle();
     }
 
     @Override
     public HttpUrl getUrl() {
-        return null;
+        return HttpUrl.parse(CHANNEL_URL_PREFIX + getChannelId());
     }
 
     public YoutubeChannel(SearchResult searchResult) {
@@ -27,8 +27,19 @@ public final class YoutubeChannel implements Result {
     private final SearchResult searchResult;
 
     private void assertResponsePopulated() {
-        Require.notBlank(searchResult.getSnippet().getChannelId(), titled("channelId"));
-        Require.notBlank(searchResult.getSnippet().getChannelTitle(), titled("channelTitle"));
+        Require.notNull(searchResult.getSnippet(), titled("snippet"));
+        Require.notBlank(getChannelId(), titled("channelId"));
+        Require.notBlank(getChannelTitle(), titled("channelTitle"));
     }
+
+    private String getChannelId() {
+        return searchResult.getSnippet().getChannelId();
+    }
+
+    private String getChannelTitle() {
+        return searchResult.getSnippet().getChannelTitle();
+    }
+
+    private static final String CHANNEL_URL_PREFIX = "https://www.youtube.com/channel/";
 
 }

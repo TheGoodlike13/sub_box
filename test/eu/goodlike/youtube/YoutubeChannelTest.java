@@ -1,35 +1,33 @@
 package eu.goodlike.youtube;
 
 import com.google.api.services.youtube.model.SearchResult;
-import com.google.api.services.youtube.model.SearchResultSnippet;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.function.ThrowingConsumer;
 
 import static eu.goodlike.asserts.Asserts.assertInvalidBlank;
 import static eu.goodlike.asserts.Asserts.assertInvalidNull;
+import static eu.goodlike.youtube.YoutubeChannelMock.*;
+import static org.assertj.core.api.Assertions.assertThat;
 
 public class YoutubeChannelTest {
 
     @Test
     public void nullSearchResult() {
-        assertInvalidNull("searchResult", (ThrowingConsumer<SearchResult>)YoutubeChannel::new);
+        assertInvalidNull("searchResult", YoutubeChannel::new);
+        assertInvalidNull("snippet", any -> new YoutubeChannel(new SearchResult()));
     }
 
     @Test
     public void noBlankSearchResultContents() {
-        assertInvalidBlank("channelId", input -> populateSearchResult(input, "any"));
-        assertInvalidBlank("channelTitle", input -> populateSearchResult("any", input));
+        assertInvalidBlank("channelId", input -> toYoutubeChannel(input, "any"));
+        assertInvalidBlank("channelTitle", input -> toYoutubeChannel("any", input));
     }
 
-    private void populateSearchResult(String channelId, String channelTitle) {
-        SearchResultSnippet snippet = new SearchResultSnippet();
-        snippet.setChannelId(channelId);
-        snippet.setChannelTitle(channelTitle);
+    @Test
+    public void getters() {
+        YoutubeChannel channel = ofGoodlike();
 
-        SearchResult searchResult = new SearchResult();
-        searchResult.setSnippet(snippet);
-
-        new YoutubeChannel(searchResult);
+        assertThat(channel.getUrl()).isEqualTo(GOODLIKE_CHANNEL_URL);
+        assertThat(channel.getTitle()).isEqualTo(GOODLIKE_CHANNEL_TITLE);
     }
 
 }
