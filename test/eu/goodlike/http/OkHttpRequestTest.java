@@ -78,10 +78,11 @@ public class OkHttpRequestTest {
 
     @Test
     public void requestWithBody() throws IOException {
-        withContent(newRequest("post"), "text").execute();
+        withContent(newRequest("post"), "text", null).execute();
 
         Request actualRequest = request.build();
         assertThat(actualRequest.method()).isEqualTo("POST");
+        assertThat(actualRequest.header("Content-Encoding")).isNull();
 
         RequestBody body = actualRequest.body();
         assertThat(body).isNotNull();
@@ -90,9 +91,17 @@ public class OkHttpRequestTest {
     }
 
     @Test
+    public void requestWithContentEncoding() throws IOException {
+        withContent(newRequest("post"), "text", "identity").execute();
+
+        Request actualRequest = request.build();
+        assertThat(actualRequest.header("Content-Encoding")).isEqualTo("identity");
+    }
+
+    @Test
     public void requestWithMethodForWhichBodyIsForbidden() {
         assertThatExceptionOfType(IllegalArgumentException.class)
-                .isThrownBy(() -> withContent(newRequest("get"), "any").execute());
+                .isThrownBy(() -> withContent(newRequest("get"), "any", null).execute());
     }
 
     @Test
@@ -110,9 +119,9 @@ public class OkHttpRequestTest {
         return new OkHttpRequest(clientMock, request, method);
     }
 
-    private OkHttpRequest withContent(OkHttpRequest httpRequest, String text) throws IOException {
+    private OkHttpRequest withContent(OkHttpRequest httpRequest, String text, String encoding) throws IOException {
         httpRequest.setContentType("text/plain");
-        httpRequest.setContentEncoding("identity");
+        httpRequest.setContentEncoding(encoding);
         httpRequest.setContentLength(text.length());
         MockHttpContent content = new MockHttpContent();
         content.setContent(text.getBytes(UTF_8));

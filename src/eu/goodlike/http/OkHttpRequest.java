@@ -45,13 +45,22 @@ public final class OkHttpRequest extends LowLevelHttpRequest {
     final String method;
 
     private Request createRequest() {
-        return request.method(method, getRequestBody()).build();
+        return request
+                .method(method, getRequestBody())
+                .build();
     }
 
     private RequestBody getRequestBody() {
         return getStreamingContent() == null
                 ? null
-                : new OkHttpRequestBody();
+                : createRequestBody();
+    }
+
+    private OkHttpRequestBody createRequestBody() {
+        if (getContentEncoding() != null) {
+            addHeader("Content-Encoding", getContentEncoding());
+        }
+        return new OkHttpRequestBody();
     }
 
     private final class OkHttpRequestBody extends RequestBody {
