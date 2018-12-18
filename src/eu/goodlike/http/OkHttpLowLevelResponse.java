@@ -76,7 +76,7 @@ public final class OkHttpLowLevelResponse extends LowLevelHttpResponse {
         getBody().ifPresent(ResponseBody::close);
     }
 
-    public OkHttpLowLevelResponse(Response response) {
+    OkHttpLowLevelResponse(Response response) {
         this.response = Require.notNull(response, titled("response"));
     }
 
