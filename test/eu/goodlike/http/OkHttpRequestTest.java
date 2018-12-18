@@ -1,8 +1,7 @@
 package eu.goodlike.http;
 
-import okhttp3.Call;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
+import com.google.api.client.testing.http.MockHttpContent;
+import okhttp3.*;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -14,7 +13,9 @@ import static eu.goodlike.test.asserts.Asserts.assertInvalidBlank;
 import static eu.goodlike.test.asserts.Asserts.assertInvalidNull;
 import static eu.goodlike.test.mocks.OkHttpMocks.basicRequest;
 import static eu.goodlike.test.mocks.OkHttpMocks.basicResponse;
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.refEq;
 
@@ -27,9 +28,10 @@ public class OkHttpRequestTest {
 
     @BeforeEach
     public void setup() throws IOException {
-        Mockito.when(clientMock.connectTimeoutMillis()).thenReturn((int)TimeUnit.SECONDS.toMillis(20));
-        Mockito.when(clientMock.readTimeoutMillis()).thenReturn((int)TimeUnit.SECONDS.toMillis(20));
+        Mockito.when(clientMock.connectTimeoutMillis()).thenReturn(secondsToMillis(20));
+        Mockito.when(clientMock.readTimeoutMillis()).thenReturn(secondsToMillis(20));
 
+        Mockito.when(clientMock.newCall(any(Request.class))).thenReturn(callMock);
         Mockito.when(callMock.execute()).thenReturn(basicResponse().build());
     }
 
@@ -53,15 +55,12 @@ public class OkHttpRequestTest {
 
         setTimeout(okHttpRequest, 30, 40);
 
-        assertThat(okHttpRequest.getClient())
-                .extracting(OkHttpClient::connectTimeoutMillis, OkHttpClient::readTimeoutMillis)
-                .containsExactly(30000, 40000);
+        assertThat(okHttpRequest.client.connectTimeoutMillis()).isEqualTo(secondsToMillis(30));
+        assertThat(okHttpRequest.client.readTimeoutMillis()).isEqualTo(secondsToMillis(40));
     }
 
     @Test
-    public void execute() throws IOException {
-        mockCallForClient(clientMock);
-
+    public void executeRequest() throws IOException {
         newRequest("get").execute();
 
         Mockito.verify(clientMock).newCall(refEq(request.build()));
@@ -69,20 +68,64 @@ public class OkHttpRequestTest {
     }
 
     @Test
+    public void requestWithoutBody() throws IOException {
+        newRequest("get").execute();
+
+        Request actualRequest = request.build();
+        assertThat(actualRequest.method()).isEqualTo("GET");
+        assertThat(actualRequest.body()).isNull();
+    }
+
+    @Test
+    public void requestWithBody() throws IOException {
+        withContent(newRequest("post"), "text").execute();
+
+        Request actualRequest = request.build();
+        assertThat(actualRequest.method()).isEqualTo("POST");
+
+        RequestBody body = actualRequest.body();
+        assertThat(body).isNotNull();
+        assertThat(body.contentType()).isEqualTo(MediaType.get("text/plain"));
+        assertThat(body.contentLength()).isEqualTo(4);
+    }
+
+    @Test
+    public void requestWithMethodForWhichBodyIsForbidden() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> withContent(newRequest("get"), "any").execute());
+    }
+
+    @Test
+    public void requestWithMethodForWhichNullBodyIsForbidden() {
+        assertThatExceptionOfType(IllegalArgumentException.class)
+                .isThrownBy(() -> newRequest("post").execute());
+    }
+
+    @Test
     public void uppercaseMethod() {
-        assertThat(newRequest("get").getMethod()).isEqualTo("GET");
+        assertThat(newRequest("get").method).isEqualTo("GET");
     }
 
     private OkHttpRequest newRequest(String method) {
         return new OkHttpRequest(clientMock, request, method);
     }
 
-    private void mockCallForClient(OkHttpClient clientMock) {
-        Mockito.when(clientMock.newCall(any(Request.class))).thenReturn(callMock);
+    private OkHttpRequest withContent(OkHttpRequest httpRequest, String text) throws IOException {
+        httpRequest.setContentType("text/plain");
+        httpRequest.setContentEncoding("identity");
+        httpRequest.setContentLength(text.length());
+        MockHttpContent content = new MockHttpContent();
+        content.setContent(text.getBytes(UTF_8));
+        httpRequest.setStreamingContent(content);
+        return httpRequest;
     }
 
     private void setTimeout(OkHttpRequest okHttpRequest, int connectionTimeoutSeconds, int readTimeoutSeconds) {
-        okHttpRequest.setTimeout((int) TimeUnit.SECONDS.toMillis(connectionTimeoutSeconds), (int)TimeUnit.SECONDS.toMillis(readTimeoutSeconds));
+        okHttpRequest.setTimeout(secondsToMillis(connectionTimeoutSeconds), secondsToMillis(readTimeoutSeconds));
+    }
+
+    private int secondsToMillis(int seconds) {
+        return (int) TimeUnit.SECONDS.toMillis(seconds);
     }
 
 }

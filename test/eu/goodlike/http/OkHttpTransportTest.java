@@ -56,11 +56,9 @@ public class OkHttpTransportTest {
     public void buildRequest() {
         OkHttpRequest request = transport.buildRequest("get", basicUrl());
 
-        assertThat(request)
-                .extracting(OkHttpRequest::getClient, OkHttpRequest::getMethod)
-                .containsExactly(clientMock, "GET");
-
-        assertThat(request.getRequest()).isEqualToComparingFieldByFieldRecursively(basicRequest());
+        assertThat(request.client).isEqualTo(clientMock);
+        assertThat(request.method).isEqualTo("GET");
+        assertThat(request.request).isEqualToComparingFieldByFieldRecursively(basicRequest());
     }
 
     @Test

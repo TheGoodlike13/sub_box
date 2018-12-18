@@ -2,11 +2,11 @@ package eu.goodlike.http;
 
 import com.google.api.client.http.LowLevelHttpRequest;
 import eu.goodlike.util.Require;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import okhttp3.*;
+import okio.BufferedSink;
 
 import java.io.IOException;
+import java.nio.channels.Channels;
 import java.util.concurrent.TimeUnit;
 
 import static eu.goodlike.util.Require.titled;
@@ -29,7 +29,7 @@ public final class OkHttpRequest extends LowLevelHttpRequest {
 
     @Override
     public OkHttpResponse execute() throws IOException {
-        Response response = client.newCall(request.build()).execute();
+        Response response = client.newCall(createRequest()).execute();
         return new OkHttpResponse(response);
     }
 
@@ -39,20 +39,37 @@ public final class OkHttpRequest extends LowLevelHttpRequest {
         this.method = Require.notBlank(method, titled("method")).toUpperCase();
     }
 
-    OkHttpClient getClient() {
-        return client;
+    OkHttpClient client;
+
+    final Request.Builder request;
+    final String method;
+
+    private Request createRequest() {
+        return request.method(method, getRequestBody()).build();
     }
 
-    Request.Builder getRequest() {
-        return request;
+    private RequestBody getRequestBody() {
+        return getStreamingContent() == null
+                ? null
+                : new OkHttpRequestBody();
     }
 
-    String getMethod() {
-        return method;
-    }
+    private final class OkHttpRequestBody extends RequestBody {
+        @Override
+        public MediaType contentType() {
+            return MediaType.parse(getContentType());
+        }
 
-    private OkHttpClient client;
-    private final Request.Builder request;
-    private final String method;
+        @Override
+        public long contentLength() {
+            return getContentLength();
+        }
+
+        @Override
+        @SuppressWarnings("NullableProblems")
+        public void writeTo(BufferedSink sink) throws IOException {
+            getStreamingContent().writeTo(Channels.newOutputStream(sink));
+        }
+    }
 
 }
