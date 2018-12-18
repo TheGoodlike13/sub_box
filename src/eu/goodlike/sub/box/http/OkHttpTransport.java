@@ -24,7 +24,7 @@ public final class OkHttpTransport extends HttpTransport {
 
     @Override
     public boolean supportsMethod(String method) {
-        return StringUtils.isNotEmpty(method);
+        return StringUtils.isNotBlank(method);
     }
 
     @Override

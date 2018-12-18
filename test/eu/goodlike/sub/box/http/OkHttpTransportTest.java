@@ -32,7 +32,7 @@ public class OkHttpTransportTest {
     public void supportsMethod() {
         assertThat(transport.supportsMethod(null)).isFalse();
         assertThat(transport.supportsMethod("")).isFalse();
-        assertThat(transport.supportsMethod(" ")).isTrue();
+        assertThat(transport.supportsMethod(" ")).isFalse();
         assertThat(transport.supportsMethod("not_a_method")).isTrue();
 
         assertThat(transport.supportsMethod(HttpMethods.CONNECT)).isTrue();
