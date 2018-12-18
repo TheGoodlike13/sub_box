@@ -13,11 +13,15 @@ public final class OkHttpMocks {
     }
 
     public static Request.Builder basicRequest() {
-        return new Request.Builder().url("https://www.google.com/");
+        return new Request.Builder().url(basicUrl());
     }
 
     public static ResponseBody toBody(String text) {
         return ResponseBody.create(MediaType.get("text/plain"), text);
+    }
+
+    public static String basicUrl() {
+        return "https://www.google.com/";
     }
 
     private OkHttpMocks() {

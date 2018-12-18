@@ -33,16 +33,26 @@ public final class OkHttpRequest extends LowLevelHttpRequest {
         return new OkHttpResponse(response);
     }
 
-    OkHttpRequest(OkHttpClient client, Request.Builder request) {
+    OkHttpRequest(OkHttpClient client, Request.Builder request, String method) {
         this.client = Require.notNull(client, titled("client"));
         this.request = Require.notNull(request, titled("request"));
+        this.method = Require.notBlank(method, titled("method")).toUpperCase();
     }
 
     OkHttpClient getClient() {
         return client;
     }
 
+    Request.Builder getRequest() {
+        return request;
+    }
+
+    String getMethod() {
+        return method;
+    }
+
     private OkHttpClient client;
     private final Request.Builder request;
+    private final String method;
 
 }

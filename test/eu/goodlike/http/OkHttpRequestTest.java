@@ -10,6 +10,7 @@ import org.mockito.Mockito;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import static eu.goodlike.test.asserts.Asserts.assertInvalidBlank;
 import static eu.goodlike.test.asserts.Asserts.assertInvalidNull;
 import static eu.goodlike.test.mocks.OkHttpMocks.basicRequest;
 import static eu.goodlike.test.mocks.OkHttpMocks.basicResponse;
@@ -34,30 +35,21 @@ public class OkHttpRequestTest {
 
     @Test
     public void nullInputs() {
-        assertInvalidNull("client", (OkHttpClient client) -> new OkHttpRequest(client, request));
-        assertInvalidNull("request", (Request.Builder request) -> new OkHttpRequest(clientMock, request));
+        assertInvalidNull("client", (OkHttpClient client) -> new OkHttpRequest(client, request, "any"));
+        assertInvalidNull("request", (Request.Builder request) -> new OkHttpRequest(clientMock, request, "any"));
+        assertInvalidBlank("method", blank -> new OkHttpRequest(clientMock, request, blank));
     }
 
     @Test
     public void addHeader() {
-        newRequest().addHeader("x-header", "value");
+        newRequest("get").addHeader("x-header", "value");
 
         assertThat(request.build().header("x-header")).isEqualTo("value");
     }
 
     @Test
-    public void execute() throws IOException {
-        mockCallForClient(clientMock);
-
-        newRequest().execute();
-
-        Mockito.verify(clientMock).newCall(refEq(request.build()));
-        Mockito.verify(callMock).execute();
-    }
-
-    @Test
     public void setTimeout() {
-        OkHttpRequest okHttpRequest = new OkHttpRequest(new OkHttpClient(), request);
+        OkHttpRequest okHttpRequest = new OkHttpRequest(new OkHttpClient(), request, "get");
 
         setTimeout(okHttpRequest, 30, 40);
 
@@ -66,8 +58,23 @@ public class OkHttpRequestTest {
                 .containsExactly(30000, 40000);
     }
 
-    private OkHttpRequest newRequest() {
-        return new OkHttpRequest(clientMock, request);
+    @Test
+    public void execute() throws IOException {
+        mockCallForClient(clientMock);
+
+        newRequest("get").execute();
+
+        Mockito.verify(clientMock).newCall(refEq(request.build()));
+        Mockito.verify(callMock).execute();
+    }
+
+    @Test
+    public void uppercaseMethod() {
+        assertThat(newRequest("get").getMethod()).isEqualTo("GET");
+    }
+
+    private OkHttpRequest newRequest(String method) {
+        return new OkHttpRequest(clientMock, request, method);
     }
 
     private void mockCallForClient(OkHttpClient clientMock) {
