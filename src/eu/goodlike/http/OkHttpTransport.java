@@ -11,6 +11,15 @@ import java.io.IOException;
 
 import static eu.goodlike.util.Require.titled;
 
+/**
+ * {@link HttpTransport} implementation which uses {@link OkHttpClient} to create and make HTTP requests. Just like
+ * {@link OkHttpClient}, it is intended that a single instance of this class is reused for the entire application.
+ * <p/>
+ * This {@link HttpTransport} supports all HTTP methods.
+ * <p/>
+ * Upon shutdown, it aggressively releases all resources from containing {@link OkHttpClient} as described by its
+ * documentation.
+ */
 public final class OkHttpTransport extends HttpTransport {
 
     @Override

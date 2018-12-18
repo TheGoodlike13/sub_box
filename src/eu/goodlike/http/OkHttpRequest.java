@@ -11,7 +11,13 @@ import java.util.concurrent.TimeUnit;
 
 import static eu.goodlike.util.Require.titled;
 
-public final class OkHttpRequest extends LowLevelHttpRequest {
+/**
+ * {@link LowLevelHttpRequest} implemented using {@link OkHttpClient} and related objects. It is used internally by
+ * {@link OkHttpTransport}.
+ * <p/>
+ * This implementation is not thread-safe.
+ */
+final class OkHttpRequest extends LowLevelHttpRequest {
 
     @Override
     public void addHeader(String name, String value) {
@@ -39,6 +45,7 @@ public final class OkHttpRequest extends LowLevelHttpRequest {
         this.method = Require.notBlank(method, titled("method")).toUpperCase();
     }
 
+    // fields are package private to allow tests to assert on the objects (otherwise impossible without reflection)
     OkHttpClient client;
 
     final Request.Builder request;

@@ -3,6 +3,7 @@ package eu.goodlike.http;
 import com.google.api.client.http.LowLevelHttpResponse;
 import eu.goodlike.util.Require;
 import okhttp3.MediaType;
+import okhttp3.OkHttpClient;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
 import okhttp3.internal.http.StatusLine;
@@ -12,7 +13,13 @@ import java.util.Optional;
 
 import static eu.goodlike.util.Require.titled;
 
-public final class OkHttpResponse extends LowLevelHttpResponse {
+/**
+ * {@link LowLevelHttpResponse} implemented using {@link OkHttpClient} and related objects. It is used internally by
+ * {@link OkHttpRequest}.
+ * <p/>
+ * This implementation should be assumed not to be thread-safe.
+ */
+final class OkHttpResponse extends LowLevelHttpResponse {
 
     @Override
     public InputStream getContent() {
