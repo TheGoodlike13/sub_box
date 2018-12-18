@@ -1,20 +1,23 @@
 package eu.goodlike.http;
 
-import okhttp3.*;
+import okhttp3.Response;
+import okhttp3.ResponseBody;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import java.util.function.Function;
 
-import static eu.goodlike.asserts.Asserts.assertInvalidNull;
+import static eu.goodlike.test.asserts.Asserts.assertInvalidNull;
+import static eu.goodlike.test.mocks.OkHttpMocks.basicResponse;
+import static eu.goodlike.test.mocks.OkHttpMocks.toBody;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
-public class OkHttpLowLevelResponseTest {
+public class OkHttpResponseTest {
 
     @Test
     public void nullInputs() {
-        assertInvalidNull("response", OkHttpLowLevelResponse::new);
+        assertInvalidNull("response", OkHttpResponse::new);
     }
 
     @Test
@@ -92,25 +95,12 @@ public class OkHttpLowLevelResponseTest {
         Mockito.verify(mockBody).close();
     }
 
-    private OkHttpLowLevelResponse newResponse() {
+    private OkHttpResponse newResponse() {
         return newResponse(Function.identity());
     }
 
-    private OkHttpLowLevelResponse newResponse(Function<Response.Builder, Response.Builder> steps) {
-        Response.Builder builder = createResponseWithBasicValues();
-        return new OkHttpLowLevelResponse(steps.apply(builder).build());
-    }
-
-    private Response.Builder createResponseWithBasicValues() {
-        return new Response.Builder()
-                .request(new Request.Builder().url("https://www.google.com/").build())
-                .protocol(Protocol.HTTP_1_1)
-                .code(200)
-                .message("OK");
-    }
-
-    private ResponseBody toBody(String text) {
-        return ResponseBody.create(MediaType.get("text/plain"), text);
+    private OkHttpResponse newResponse(Function<Response.Builder, Response.Builder> steps) {
+        return new OkHttpResponse(steps.apply(basicResponse()).build());
     }
 
 }

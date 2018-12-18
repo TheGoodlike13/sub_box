@@ -4,8 +4,8 @@ import org.junit.jupiter.api.Test;
 
 import java.util.function.Consumer;
 
-import static eu.goodlike.asserts.Asserts.assertInvalidBlank;
-import static eu.goodlike.asserts.Asserts.assertInvalidNull;
+import static eu.goodlike.test.asserts.Asserts.assertInvalidBlank;
+import static eu.goodlike.test.asserts.Asserts.assertInvalidNull;
 import static eu.goodlike.util.Require.titled;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;

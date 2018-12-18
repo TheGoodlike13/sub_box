@@ -1,4 +1,4 @@
-package eu.goodlike.asserts;
+package eu.goodlike.test.asserts;
 
 import org.junit.jupiter.api.function.ThrowingConsumer;
 

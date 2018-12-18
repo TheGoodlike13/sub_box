@@ -3,8 +3,8 @@ package eu.goodlike.youtube;
 import com.google.api.services.youtube.model.SearchResult;
 import org.junit.jupiter.api.Test;
 
-import static eu.goodlike.asserts.Asserts.assertInvalidBlank;
-import static eu.goodlike.asserts.Asserts.assertInvalidNull;
+import static eu.goodlike.test.asserts.Asserts.assertInvalidBlank;
+import static eu.goodlike.test.asserts.Asserts.assertInvalidNull;
 import static eu.goodlike.youtube.YoutubeChannelMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
