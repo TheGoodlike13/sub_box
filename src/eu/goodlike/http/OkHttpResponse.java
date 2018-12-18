@@ -12,7 +12,7 @@ import java.util.Optional;
 
 import static eu.goodlike.util.Require.titled;
 
-public final class OkHttpLowLevelResponse extends LowLevelHttpResponse {
+public final class OkHttpResponse extends LowLevelHttpResponse {
 
     @Override
     public InputStream getContent() {
@@ -76,7 +76,7 @@ public final class OkHttpLowLevelResponse extends LowLevelHttpResponse {
         getBody().ifPresent(ResponseBody::close);
     }
 
-    OkHttpLowLevelResponse(Response response) {
+    OkHttpResponse(Response response) {
         this.response = Require.notNull(response, titled("response"));
     }
 
