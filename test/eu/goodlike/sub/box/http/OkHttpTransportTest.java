@@ -1,4 +1,4 @@
-package eu.goodlike.http;
+package eu.goodlike.sub.box.http;
 
 import com.google.api.client.http.HttpMethods;
 import com.google.common.io.Files;

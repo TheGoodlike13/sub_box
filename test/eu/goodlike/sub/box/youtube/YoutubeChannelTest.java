@@ -1,11 +1,11 @@
-package eu.goodlike.youtube;
+package eu.goodlike.sub.box.youtube;
 
 import com.google.api.services.youtube.model.SearchResult;
 import org.junit.jupiter.api.Test;
 
+import static eu.goodlike.sub.box.youtube.YoutubeChannelMock.*;
 import static eu.goodlike.test.asserts.Asserts.assertInvalidBlank;
 import static eu.goodlike.test.asserts.Asserts.assertInvalidNull;
-import static eu.goodlike.youtube.YoutubeChannelMock.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class YoutubeChannelTest {

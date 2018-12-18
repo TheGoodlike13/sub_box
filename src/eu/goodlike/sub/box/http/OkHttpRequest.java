@@ -1,7 +1,7 @@
-package eu.goodlike.http;
+package eu.goodlike.sub.box.http;
 
 import com.google.api.client.http.LowLevelHttpRequest;
-import eu.goodlike.util.Require;
+import eu.goodlike.sub.box.util.Require;
 import okhttp3.*;
 import okio.BufferedSink;
 
@@ -9,7 +9,7 @@ import java.io.IOException;
 import java.nio.channels.Channels;
 import java.util.concurrent.TimeUnit;
 
-import static eu.goodlike.util.Require.titled;
+import static eu.goodlike.sub.box.util.Require.titled;
 
 /**
  * {@link LowLevelHttpRequest} implemented using {@link OkHttpClient} and related objects. It is used internally by

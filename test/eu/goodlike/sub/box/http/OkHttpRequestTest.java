@@ -1,4 +1,4 @@
-package eu.goodlike.http;
+package eu.goodlike.sub.box.http;
 
 import com.google.api.client.testing.http.MockHttpContent;
 import okhttp3.*;

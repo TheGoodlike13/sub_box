@@ -1,4 +1,4 @@
-package eu.goodlike.util;
+package eu.goodlike.sub.box.util;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;

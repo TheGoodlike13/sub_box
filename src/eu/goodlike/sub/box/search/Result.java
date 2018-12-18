@@ -1,4 +1,4 @@
-package eu.goodlike.search;
+package eu.goodlike.sub.box.search;
 
 import okhttp3.HttpUrl;
 

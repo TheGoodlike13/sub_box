@@ -1,13 +1,13 @@
-package eu.goodlike.youtube;
+package eu.goodlike.sub.box.youtube;
 
-import eu.goodlike.search.Result;
-import eu.goodlike.search.Search;
+import eu.goodlike.sub.box.search.Result;
+import eu.goodlike.sub.box.search.Search;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
 
-import static eu.goodlike.youtube.YoutubeChannelMock.ofGoodlike;
+import static eu.goodlike.sub.box.youtube.YoutubeChannelMock.ofGoodlike;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 

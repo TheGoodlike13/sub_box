@@ -1,4 +1,4 @@
-package eu.goodlike.http;
+package eu.goodlike.sub.box.http;
 
 import okhttp3.Response;
 import okhttp3.ResponseBody;

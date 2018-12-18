@@ -1,4 +1,4 @@
-package eu.goodlike;
+package eu.goodlike.sub.box;
 
 public class Main {
 

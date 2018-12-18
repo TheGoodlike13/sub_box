@@ -1,11 +1,11 @@
-package eu.goodlike.youtube;
+package eu.goodlike.sub.box.youtube;
 
 import com.google.api.services.youtube.model.SearchResult;
-import eu.goodlike.search.Result;
-import eu.goodlike.util.Require;
+import eu.goodlike.sub.box.search.Result;
+import eu.goodlike.sub.box.util.Require;
 import okhttp3.HttpUrl;
 
-import static eu.goodlike.util.Require.titled;
+import static eu.goodlike.sub.box.util.Require.titled;
 
 public final class YoutubeChannel implements Result {
 

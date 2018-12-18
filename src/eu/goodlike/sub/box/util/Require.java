@@ -1,4 +1,4 @@
-package eu.goodlike.util;
+package eu.goodlike.sub.box.util;
 
 import org.apache.commons.lang3.StringUtils;
 

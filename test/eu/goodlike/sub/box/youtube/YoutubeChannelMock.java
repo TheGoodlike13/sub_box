@@ -1,4 +1,4 @@
-package eu.goodlike.youtube;
+package eu.goodlike.sub.box.youtube;
 
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.SearchResultSnippet;
