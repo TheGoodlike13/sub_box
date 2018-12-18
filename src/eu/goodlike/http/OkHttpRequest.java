@@ -20,12 +20,11 @@ public final class OkHttpRequest extends LowLevelHttpRequest {
 
     @Override
     public void setTimeout(int connectTimeout, int readTimeout) {
-        if (connectTimeout != client.connectTimeoutMillis() || readTimeout != client.readTimeoutMillis()) {
+        if (connectTimeout != client.connectTimeoutMillis() || readTimeout != client.readTimeoutMillis())
             client = client.newBuilder()
                     .connectTimeout(connectTimeout, TimeUnit.MILLISECONDS)
                     .readTimeout(readTimeout, TimeUnit.MILLISECONDS)
                     .build();
-        }
     }
 
     @Override
