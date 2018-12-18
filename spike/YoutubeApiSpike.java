@@ -8,23 +8,23 @@ import java.io.IOException;
 
 public final class YoutubeApiSpike {
 
-    private static final String PUBLIC_API_KEY = "AIzaSyC7Z0dhCTFFR_0Gt4YpuFjIlmEPFuvqpg8";
+  public static void main(String... args) throws IOException {
+    YouTube youTube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), null)
+        .setApplicationName("sub_box")
+        .build();
 
-    public static void main(String... args) throws IOException {
-        YouTube youTube = new YouTube.Builder(new NetHttpTransport(), new JacksonFactory(), null)
-                .setApplicationName("sub_box")
-                .build();
+    YouTube.Search.List search = youTube.search().list("id,snippet");
 
-        YouTube.Search.List search = youTube.search().list("id,snippet");
+    search.setKey(PUBLIC_API_KEY);
+    search.setMaxResults(13L);
+    search.setQ("let's code");
 
-        search.setKey(PUBLIC_API_KEY);
-        search.setMaxResults(13L);
-        search.setQ("let's code");
-
-        SearchListResponse response = search.execute();
-        for (SearchResult item : response.getItems()) {
-            System.out.println(item);
-        }
+    SearchListResponse response = search.execute();
+    for (SearchResult item : response.getItems()) {
+      System.out.println(item);
     }
+  }
+
+  private static final String PUBLIC_API_KEY = "AIzaSyC7Z0dhCTFFR_0Gt4YpuFjIlmEPFuvqpg8";
 
 }

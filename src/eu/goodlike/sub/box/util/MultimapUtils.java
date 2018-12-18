@@ -11,18 +11,18 @@ import static com.google.common.collect.ImmutableListMultimap.flatteningToImmuta
 
 public final class MultimapUtils {
 
-    public static <K, V> ListMultimap<K, V> toListMultimap(Map<K, List<V>> map) {
-        return map == null
-                ? ImmutableListMultimap.of()
-                : map.entrySet().stream().collect(flatteningToImmutableListFromEntries());
-    }
+  public static <K, V> ListMultimap<K, V> toListMultimap(Map<K, List<V>> map) {
+    return map == null
+        ? ImmutableListMultimap.of()
+        : map.entrySet().stream().collect(flatteningToImmutableListFromEntries());
+  }
 
-    private MultimapUtils() {
-        throw new AssertionError("Do not instantiate! Use static fields/methods!");
-    }
+  private MultimapUtils() {
+    throw new AssertionError("Do not instantiate! Use static fields/methods!");
+  }
 
-    private static <K, V> Collector<Map.Entry<K, List<V>>, ?, ImmutableListMultimap<K, V>> flatteningToImmutableListFromEntries() {
-        return flatteningToImmutableListMultimap(Map.Entry::getKey, e -> e.getValue().stream());
-    }
+  private static <K, V> Collector<Map.Entry<K, List<V>>, ?, ImmutableListMultimap<K, V>> flatteningToImmutableListFromEntries() {
+    return flatteningToImmutableListMultimap(Map.Entry::getKey, e -> e.getValue().stream());
+  }
 
 }

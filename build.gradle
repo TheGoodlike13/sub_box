@@ -1,6 +1,7 @@
+import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
+
 import java.nio.file.Files
 import java.nio.file.StandardCopyOption
-import com.github.jengelman.gradle.plugins.shadow.transformers.Log4j2PluginsCacheFileTransformer
 
 plugins {
     id 'java'
@@ -19,7 +20,7 @@ sourceSets {
 
 dependencies {
     compile 'com.google.apis:google-api-services-youtube:v3-rev206-1.25.0'
-    
+
     compile group: 'com.squareup.okhttp3', name: 'okhttp', version: '3.12.0'
 
     compile 'com.google.guava:guava:27.0-jre'
@@ -55,7 +56,7 @@ def jarPath = projectPath.resolve('artifacts')
 shadowJar {
     transform(Log4j2PluginsCacheFileTransformer.class)
     mergeServiceFiles()
-    
+
     baseName = rootProject.name
     classifier = null
     version = project.version

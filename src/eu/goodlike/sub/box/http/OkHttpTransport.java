@@ -22,44 +22,44 @@ import static eu.goodlike.sub.box.util.Require.titled;
  */
 public final class OkHttpTransport extends HttpTransport {
 
-    @Override
-    public boolean supportsMethod(String method) {
-        return StringUtils.isNotBlank(method);
-    }
+  @Override
+  public boolean supportsMethod(String method) {
+    return StringUtils.isNotBlank(method);
+  }
 
-    @Override
-    protected OkHttpRequest buildRequest(String method, String url) {
-        if (!supportsMethod(method))
-            throw new IllegalArgumentException("Unsupported HTTP method: " + method);
+  @Override
+  protected OkHttpRequest buildRequest(String method, String url) {
+    if (!supportsMethod(method))
+      throw new IllegalArgumentException("Unsupported HTTP method: " + method);
 
-        return new OkHttpRequest(client, new Request.Builder().url(url), method);
-    }
+    return new OkHttpRequest(client, new Request.Builder().url(url), method);
+  }
 
-    @Override
-    public void shutdown() throws IOException {
-        shutdownExecutorService();
-        shutdownConnectionPool();
-        shutdownCache();
-    }
+  @Override
+  public void shutdown() throws IOException {
+    shutdownExecutorService();
+    shutdownConnectionPool();
+    shutdownCache();
+  }
 
-    public OkHttpTransport(OkHttpClient client) {
-        this.client = Require.notNull(client, titled("client"));
-    }
+  public OkHttpTransport(OkHttpClient client) {
+    this.client = Require.notNull(client, titled("client"));
+  }
 
-    private final OkHttpClient client;
+  private final OkHttpClient client;
 
-    private void shutdownExecutorService() {
-        client.dispatcher().executorService().shutdown();
-    }
+  private void shutdownExecutorService() {
+    client.dispatcher().executorService().shutdown();
+  }
 
-    private void shutdownConnectionPool() {
-        client.connectionPool().evictAll();
-    }
+  private void shutdownConnectionPool() {
+    client.connectionPool().evictAll();
+  }
 
-    private void shutdownCache() throws IOException {
-        Cache cache = client.cache();
-        if (cache != null)
-            cache.close();
-    }
+  private void shutdownCache() throws IOException {
+    Cache cache = client.cache();
+    if (cache != null)
+      cache.close();
+  }
 
 }

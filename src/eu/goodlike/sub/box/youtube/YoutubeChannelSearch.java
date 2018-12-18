@@ -11,12 +11,12 @@ import static eu.goodlike.sub.box.util.Require.titled;
 
 public final class YoutubeChannelSearch implements Search {
 
-    @Override
-    public List<Result> doSearch(String searchQuery, int maxResults) {
-        Require.notBlank(searchQuery, titled("searchQuery"));
-        Require.positive(maxResults, titled("maxResults"));
+  @Override
+  public List<Result> doSearch(String searchQuery, int maxResults) {
+    Require.notBlank(searchQuery, titled("searchQuery"));
+    Require.positive(maxResults, titled("maxResults"));
 
-        return new ArrayList<>();
-    }
+    return new ArrayList<>();
+  }
 
 }

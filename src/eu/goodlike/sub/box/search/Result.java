@@ -4,8 +4,8 @@ import okhttp3.HttpUrl;
 
 public interface Result {
 
-    String getTitle();
+  String getTitle();
 
-    HttpUrl getUrl();
+  HttpUrl getUrl();
 
 }
