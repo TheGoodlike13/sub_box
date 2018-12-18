@@ -2,6 +2,7 @@ package eu.goodlike.youtube;
 
 import eu.goodlike.search.Result;
 import eu.goodlike.search.Search;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.List;
@@ -30,6 +31,7 @@ public class YoutubeChannelSearchTest {
     }
 
     @Test
+    @Disabled
     public void performYoutubeSearch() {
         List<Result> searchResults = search.doSearch("let's code", 1);
 
