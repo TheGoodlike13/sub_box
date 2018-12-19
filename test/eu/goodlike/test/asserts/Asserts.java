@@ -7,12 +7,23 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
+/**
+ * Reusable assertions
+ */
 public final class Asserts {
 
+  /**
+   * @throws AssertionError if consumerForNull does NOT throw an IllegalArgumentException with inputName and 'null'
+   * when accepting null value
+   */
   public static <T> void assertInvalidNull(String inputName, ThrowingConsumer<T> consumerForNull) {
     assertInvalid("null", null, inputName, consumerForNull);
   }
 
+  /**
+   * @throws AssertionError if consumerForBlankStrings does NOT throw an IllegalArgumentException with inputName and
+   * 'blank' when accepting any null or blank value
+   */
   public static void assertInvalidBlank(String inputName, ThrowingConsumer<String> consumerForBlankStrings) {
     for (String blankString : BLANK_STRINGS) {
       assertInvalid("blank", blankString, inputName, consumerForBlankStrings);
