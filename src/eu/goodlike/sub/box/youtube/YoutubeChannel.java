@@ -1,9 +1,12 @@
 package eu.goodlike.sub.box.youtube;
 
 import com.google.api.services.youtube.model.SearchResult;
+import com.google.common.base.MoreObjects;
 import eu.goodlike.sub.box.search.Result;
 import eu.goodlike.sub.box.util.Require;
 import okhttp3.HttpUrl;
+
+import java.util.Objects;
 
 import static eu.goodlike.sub.box.util.Require.titled;
 
@@ -41,5 +44,27 @@ public final class YoutubeChannel implements Result {
   }
 
   private static final String CHANNEL_URL_PREFIX = "https://www.youtube.com/channel/";
+
+  @Override
+  public String toString() {
+    return MoreObjects.toStringHelper(this)
+        .add("title", getTitle())
+        .add("url", getUrl())
+        .toString();
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    YoutubeChannel that = (YoutubeChannel)o;
+    return Objects.equals(getTitle(), that.getTitle()) &&
+        Objects.equals(getUrl(), that.getUrl());
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(getTitle(), getUrl());
+  }
 
 }
