@@ -11,9 +11,8 @@ import java.io.IOException;
 import java.util.List;
 
 import static eu.goodlike.sub.box.youtube.YoutubeChannelMock.*;
-import static eu.goodlike.test.asserts.Asserts.assertInvalidNull;
+import static eu.goodlike.test.asserts.Asserts.*;
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class YoutubeChannelSearchTest {
 
@@ -27,10 +26,8 @@ public class YoutubeChannelSearchTest {
 
   @Test
   public void invalidSearches() {
-    assertInvalidSearch("searchQuery", null, 1);
-    assertInvalidSearch("searchQuery", " ", 1);
-    assertInvalidSearch("maxResults", "any", -1);
-    assertInvalidSearch("maxResults", "any", 0);
+    assertInvalidBlank("searchQuery", query -> search.doSearch(query, 1));
+    assertInvalidNegativeOrZero("maxResults", maxResults -> search.doSearch("any", maxResults));
   }
 
   @Test
@@ -65,12 +62,6 @@ public class YoutubeChannelSearchTest {
     List<Result> searchResults = search.doSearch("let's code", 1);
 
     assertThat(searchResults).containsExactly(ofGoodlike());
-  }
-
-  private void assertInvalidSearch(String errorType, String searchQuery, int maxResults) {
-    assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> search.doSearch(searchQuery, maxResults))
-        .withMessageContaining(errorType);
   }
 
 }
