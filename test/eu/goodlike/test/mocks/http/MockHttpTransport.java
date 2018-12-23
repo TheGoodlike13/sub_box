@@ -1,22 +1,18 @@
-package eu.goodlike.test.mocks;
+package eu.goodlike.test.mocks.http;
 
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.LowLevelHttpRequest;
-import com.google.api.client.http.LowLevelHttpResponse;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
 import com.google.common.collect.Maps;
 import eu.goodlike.sub.box.util.Require;
 import okhttp3.HttpUrl;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.InputStream;
 import java.util.*;
 
 import static com.google.common.collect.ImmutableMap.toImmutableMap;
 import static eu.goodlike.sub.box.util.Require.titled;
-import static java.nio.charset.StandardCharsets.UTF_8;
 
 public final class MockHttpTransport extends HttpTransport {
 
@@ -45,7 +41,7 @@ public final class MockHttpTransport extends HttpTransport {
 
   @Override
   protected LowLevelHttpRequest buildRequest(String method, String url) {
-    return new MockRequest(mockResponses.get(new Key(method, url)));
+    return new MockHttpRequest(mockResponses.get(new Key(method, url)));
   }
 
   private final Map<MockHttpTransport.Key, String> mockResponses = new HashMap<>();
@@ -101,76 +97,6 @@ public final class MockHttpTransport extends HttpTransport {
     @Override
     public int hashCode() {
       return Objects.hash(method, url);
-    }
-  }
-
-  private static final class MockRequest extends LowLevelHttpRequest {
-    @Override
-    public void addHeader(String name, String value) {
-
-    }
-
-    @Override
-    public LowLevelHttpResponse execute() {
-      return new MockResponse();
-    }
-
-    private MockRequest(String response) {
-      this.response = StringUtils.trimToEmpty(response);
-    }
-
-    private final String response;
-
-    private final class MockResponse extends LowLevelHttpResponse {
-      @Override
-      public InputStream getContent() {
-        return IOUtils.toInputStream(response, UTF_8);
-      }
-
-      @Override
-      public String getContentEncoding() {
-        return null;
-      }
-
-      @Override
-      public long getContentLength() {
-        return response.length();
-      }
-
-      @Override
-      public String getContentType() {
-        return "application/json; charset=utf-8";
-      }
-
-      @Override
-      public String getStatusLine() {
-        return "HTTP/1.1 200 OK";
-      }
-
-      @Override
-      public int getStatusCode() {
-        return 200;
-      }
-
-      @Override
-      public String getReasonPhrase() {
-        return "OK";
-      }
-
-      @Override
-      public int getHeaderCount() {
-        return 0;
-      }
-
-      @Override
-      public String getHeaderName(int index) {
-        return Collections.<String>emptyList().get(index);
-      }
-
-      @Override
-      public String getHeaderValue(int index) {
-        return Collections.<String>emptyList().get(index);
-      }
     }
   }
 

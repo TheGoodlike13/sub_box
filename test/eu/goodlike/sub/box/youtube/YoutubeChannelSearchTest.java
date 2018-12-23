@@ -3,7 +3,7 @@ package eu.goodlike.sub.box.youtube;
 import com.google.common.collect.ImmutableList;
 import eu.goodlike.sub.box.search.Result;
 import eu.goodlike.sub.box.search.Search;
-import eu.goodlike.test.mocks.MockHttpTransport;
+import eu.goodlike.test.mocks.http.MockHttpTransport;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
