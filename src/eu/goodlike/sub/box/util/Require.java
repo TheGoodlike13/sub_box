@@ -24,12 +24,12 @@ public final class Require {
     return failIf(Objects::isNull, t, title, "cannot be null");
   }
 
-  public static int positive(int integer, Title title) {
-    return failIf(i -> i <= 0, integer, title, "cannot be negative or zero");
-  }
-
   public static String notBlank(String s, Title title) {
     return failIf(StringUtils::isBlank, s, title, "cannot be blank");
+  }
+
+  public static int positive(int integer, Title title) {
+    return failIf(i -> i <= 0, integer, title, "cannot be negative or zero");
   }
 
   public static <T> T notNull(T t) {
