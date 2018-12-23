@@ -89,7 +89,8 @@ sourceSets {
             srcDirs = ['test']
         }
         resources {
-            srcDirs = ['test-config']
+            srcDirs = ['test', 'test-config']
+            excludes = ["**/*.java"]
         }
     }
 }
