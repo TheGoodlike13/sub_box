@@ -3,9 +3,9 @@ package eu.goodlike.sub.box.youtube;
 import com.google.api.services.youtube.model.SearchResult;
 import org.junit.jupiter.api.Test;
 
-import static eu.goodlike.sub.box.youtube.YoutubeChannelMock.*;
 import static eu.goodlike.test.asserts.Asserts.assertInvalidBlank;
 import static eu.goodlike.test.asserts.Asserts.assertInvalidNull;
+import static eu.goodlike.test.mocks.youtube.ChannelMocks.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class YoutubeChannelTest {
@@ -24,7 +24,7 @@ public class YoutubeChannelTest {
 
   @Test
   public void getters() {
-    YoutubeChannel channel = ofGoodlike();
+    YoutubeChannel channel = getGoodlikeChannel();
 
     assertThat(channel.getUrl()).isEqualTo(GOODLIKE_CHANNEL_URL);
     assertThat(channel.getTitle()).isEqualTo(GOODLIKE_CHANNEL_TITLE);

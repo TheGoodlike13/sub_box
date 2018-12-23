@@ -1,10 +1,11 @@
-package eu.goodlike.sub.box.youtube;
+package eu.goodlike.test.mocks.youtube;
 
 import com.google.api.services.youtube.model.SearchResult;
 import com.google.api.services.youtube.model.SearchResultSnippet;
+import eu.goodlike.sub.box.youtube.YoutubeChannel;
 import okhttp3.HttpUrl;
 
-public final class YoutubeChannelMock {
+public final class ChannelMocks {
 
   public static final String GOODLIKE_CHANNEL_ID = "UC0dEueRlBJhHKfvWvJfjwxw";
   public static final String GOODLIKE_CHANNEL_TITLE = "TheGoodlike13";
@@ -21,11 +22,11 @@ public final class YoutubeChannelMock {
     return new YoutubeChannel(searchResult);
   }
 
-  public static YoutubeChannel ofGoodlike() {
+  public static YoutubeChannel getGoodlikeChannel() {
     return toYoutubeChannel(GOODLIKE_CHANNEL_ID, GOODLIKE_CHANNEL_TITLE);
   }
 
-  private YoutubeChannelMock() {
+  private ChannelMocks() {
     throw new AssertionError("Do not instantiate! Use static fields/methods!");
   }
 

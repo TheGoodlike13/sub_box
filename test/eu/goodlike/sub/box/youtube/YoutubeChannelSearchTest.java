@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 import java.io.IOException;
 import java.util.List;
 
-import static eu.goodlike.sub.box.youtube.YoutubeChannelMock.ofGoodlike;
 import static eu.goodlike.test.asserts.Asserts.*;
+import static eu.goodlike.test.mocks.youtube.ChannelMocks.getGoodlikeChannel;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class YoutubeChannelSearchTest {
@@ -39,7 +39,7 @@ public class YoutubeChannelSearchTest {
   public void performYoutubeSearch() throws IOException {
     List<Result> searchResults = search.doSearch("let's code", 1);
 
-    assertThat(searchResults).containsExactly(ofGoodlike());
+    assertThat(searchResults).containsExactly(getGoodlikeChannel());
   }
 
 }
