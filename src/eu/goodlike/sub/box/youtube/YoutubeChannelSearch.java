@@ -31,6 +31,7 @@ public final class YoutubeChannelSearch implements Search {
 
   private SearchListResponse performYoutubeSearch(String searchQuery, long maxResults) throws IOException {
     YouTube.Search.List search = youtube.search().list("snippet");
+    // TODO: no test for "snippet". add part=snippet to mock queries? or use a different mechanism?
 
     search.setQ(searchQuery);
     search.setMaxResults(maxResults);
