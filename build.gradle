@@ -40,6 +40,8 @@ dependencies {
     testCompile 'org.assertj:assertj-guava:3.2.0'
 
     testCompile 'org.mockito:mockito-all:2.0.2-beta'
+    
+    spikeCompile sourceSets.main.output
 }
 
 configurations {
