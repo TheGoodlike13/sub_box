@@ -12,9 +12,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
  * {@link LowLevelHttpRequest} implementation used internally by {@link MockHttpTransport}.
- * <p/>
- * Always returns a JSON response body from a pre-configured {@link String}. By default returns 200 OK, but can also
- * return other status codes and phrases.
  */
 final class MockHttpRequest extends LowLevelHttpRequest {
 
@@ -29,23 +26,23 @@ final class MockHttpRequest extends LowLevelHttpRequest {
   }
 
   MockHttpRequest(String successfulResponse) {
-    this(successfulResponse, 200, "OK");
+    this(IOUtils.toInputStream(StringUtils.trimToEmpty(successfulResponse), UTF_8), 200, "OK");
   }
 
-  MockHttpRequest(String response, int statusCode, String reasonPhrase) {
-    this.response = StringUtils.trimToEmpty(response);
+  MockHttpRequest(InputStream response, int statusCode, String reasonPhrase) {
+    this.response = response;
     this.statusCode = statusCode;
     this.reasonPhrase = reasonPhrase;
   }
 
-  private final String response;
+  private final InputStream response;
   private final int statusCode;
   private final String reasonPhrase;
 
   private final class MockResponse extends LowLevelHttpResponse {
     @Override
     public InputStream getContent() {
-      return IOUtils.toInputStream(response, UTF_8);
+      return response;
     }
 
     @Override
@@ -70,7 +67,7 @@ final class MockHttpRequest extends LowLevelHttpRequest {
 
     @Override
     public long getContentLength() {
-      return response.length();
+      return -1;
     }
 
     @Override
