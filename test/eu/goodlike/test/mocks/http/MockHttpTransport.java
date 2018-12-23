@@ -4,6 +4,7 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.LowLevelHttpRequest;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
+import eu.goodlike.sub.box.util.Require;
 import okhttp3.HttpUrl;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -11,8 +12,8 @@ import org.apache.commons.lang3.StringUtils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
-import java.util.Objects;
 
+import static eu.goodlike.sub.box.util.Require.titled;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**
@@ -23,7 +24,9 @@ import static java.nio.charset.StandardCharsets.UTF_8;
  * <p/>2) Files containing JSON responses.
  * <p/>
  * The first type of resources should be contained next to the test class, have ".mockhttp" suffix and start with
- * lowercase. If the test class name ends with 'Test', it should be also excluded. Some examples:
+ * lowercase.
+ * <p/>
+ * When deriving the name from test class, if its name ends with 'Test', it should be also excluded. Some examples:
  * <p/>YoutubeTest.class -> youtube.mockhttp
  * <p/>YoutubeSearchApiTest.class -> youtubeSearchApi.mockhttp
  * <p/>YoutubeSearchIT -> youtubeSearchIT.mockhttp
@@ -58,26 +61,32 @@ public final class MockHttpTransport extends HttpTransport {
   }
 
   public MockHttpTransport(Class<?> testClass) {
-    this.responses = parseResponses(Objects.requireNonNull(testClass));
+    Require.notNull(testClass, titled("testClass"));
+    this.responses = parseResponses(testClass, deriveResourceName(testClass));
+  }
+
+  public MockHttpTransport(Class<?> testClass, String resource) {
+    Require.notNull(testClass, titled("testClass"));
+    this.responses = parseResponses(testClass, resource);
   }
 
   private final List<MockHttpResponse> responses;
 
-  private List<MockHttpResponse> parseResponses(Class<?> testClass) {
-    String resourceName = deriveResourceName(testClass);
-    try (InputStream resourceContainingResponses = getResourceContainingResponses(testClass, resourceName)) {
-      return parseResponses(resourceContainingResponses);
-    } catch (IOException e) {
-      throw new AssertionError("An error occurred while trying to read resource '" + resourceName + "' derived from " + testClass, e);
-    }
-  }
-
-  private String deriveResourceName(Class<?> testClass) {
+  private static String deriveResourceName(Class<?> testClass) {
     String expectedResourceName = testClass.getSimpleName();
     if (expectedResourceName.endsWith("Test"))
       expectedResourceName = StringUtils.substringBeforeLast(expectedResourceName, "Test");
 
     return StringUtils.uncapitalize(expectedResourceName) + ".mockhttp";
+  }
+
+  private List<MockHttpResponse> parseResponses(Class<?> testClass, String resourceName) {
+    Require.notBlank(resourceName, titled("resourceName"));
+    try (InputStream resourceContainingResponses = getResourceContainingResponses(testClass, resourceName)) {
+      return parseResponses(resourceContainingResponses);
+    } catch (IOException e) {
+      throw new AssertionError("An error occurred while trying to read resource '" + resourceName + "' derived from " + testClass, e);
+    }
   }
 
   private InputStream getResourceContainingResponses(Class<?> testClass, String resourceName) {

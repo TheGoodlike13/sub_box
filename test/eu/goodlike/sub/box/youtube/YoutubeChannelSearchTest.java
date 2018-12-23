@@ -3,7 +3,6 @@ package eu.goodlike.sub.box.youtube;
 import eu.goodlike.sub.box.search.Result;
 import eu.goodlike.sub.box.search.Search;
 import eu.goodlike.test.mocks.http.MockHttpTransport;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
@@ -27,12 +26,6 @@ public class YoutubeChannelSearchTest {
   public void invalidSearches() {
     assertInvalidBlank("searchQuery", query -> search.doSearch(query, 1));
     assertInvalidNegativeOrZero("maxResults", maxResults -> search.doSearch("any", maxResults));
-  }
-
-  @Test
-  @Disabled
-  public void searchError() {
-    // TODO
   }
 
   @Test

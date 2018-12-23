@@ -1,6 +1,8 @@
 package eu.goodlike.sub.box.youtube;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.youtube.YouTube;
+import com.google.api.services.youtube.model.SearchListResponse;
 import eu.goodlike.sub.box.search.Result;
 import eu.goodlike.sub.box.search.Search;
 import eu.goodlike.sub.box.util.Require;
@@ -18,14 +20,7 @@ public final class YoutubeChannelSearch implements Search {
     Require.notBlank(searchQuery, titled("searchQuery"));
     Require.positive(maxResults, titled("maxResults"));
 
-    YouTube.Search.List search = youtube.search().list("snippet");
-
-    search.setQ(searchQuery);
-    search.setMaxResults((long)maxResults);
-
-    return search.execute().getItems().stream()
-        .map(YoutubeChannel::new)
-        .collect(toImmutableList());
+    return mapResult(performYoutubeSearch(searchQuery, maxResults));
   }
 
   public YoutubeChannelSearch(YouTube youtube) {
@@ -33,5 +28,25 @@ public final class YoutubeChannelSearch implements Search {
   }
 
   private final YouTube youtube;
+
+  private SearchListResponse performYoutubeSearch(String searchQuery, long maxResults) throws IOException {
+    YouTube.Search.List search = youtube.search().list("snippet");
+
+    search.setQ(searchQuery);
+    search.setMaxResults(maxResults);
+
+    try {
+      return search.execute();
+    }
+    catch (GoogleJsonResponseException e) {
+      throw new IllegalStateException(e);
+    }
+  }
+
+  private List<Result> mapResult(SearchListResponse result) {
+    return result.getItems().stream()
+        .map(YoutubeChannel::new)
+        .collect(toImmutableList());
+  }
 
 }
