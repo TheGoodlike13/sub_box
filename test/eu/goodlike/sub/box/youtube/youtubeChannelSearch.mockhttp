@@ -1,0 +1,5 @@
+search
+  http/thegoodlike13.json
+  q=let's code
+
+  http/noResults.json

@@ -4,16 +4,46 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.LowLevelHttpRequest;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
-import com.google.common.collect.Maps;
-import eu.goodlike.sub.box.util.Require;
 import okhttp3.HttpUrl;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.List;
+import java.util.Objects;
 
-import static com.google.common.collect.ImmutableMap.toImmutableMap;
-import static eu.goodlike.sub.box.util.Require.titled;
+import static java.nio.charset.StandardCharsets.UTF_8;
 
+/**
+ * {@link HttpTransport} implementation which mocks out the HTTP response by matching against the request URL.
+ * <p/>
+ * To mock out responses for some test class, you will require two types of resources:
+ * <p/>1) A file containing definitions of how to relate URLs to responses;
+ * <p/>2) Files containing JSON responses.
+ * <p/>
+ * The first type of resources should be contained next to the test class, have ".mockhttp" suffix and start with
+ * lowercase. If the test class name ends with 'Test', it should be also excluded. Some examples:
+ * <p/>YoutubeTest.class -> youtube.mockhttp
+ * <p/>YoutubeSearchApiTest.class -> youtubeSearchApi.mockhttp
+ * <p/>YoutubeSearchIT -> youtubeSearchIT.mockhttp
+ * <p/>
+ * These resources should have the following format (comments added only for explanation - WILL break the file format):
+ * <pre>
+ * PATH_TO_MATCH             // string expected in URL path, encoded
+ *   PATH_TO_RESOURCE_OF_SECOND_TYPE
+ *   OPTIONAL_STATUS_LINE    // defaults to 200 OK; expects 3 digits, a whitespace character and 1+ words for phrase
+ *   OPTIONAL_QUERY_TO_MATCH // query expected in URL with format "name=value", encoded, single per line
+ *                           // blank line indicates next resource or end of file
+ *   PATH_TO_RESOURCE_OF_SECOND_TYPE
+ *                           // the above resource will match PATH_TO_MATCH and any query parameters
+ * </pre>
+ * URLs are matched top to bottom, with first match being used as response.
+ * <p/>
+ * The second type of resources are searched against the classpath and should contain valid JSON that Google API can
+ * parse. It may omit optional values so long as parsing with these values omitted does not cause an error to occur or
+ * some strong assumption to be broken.
+ */
 public final class MockHttpTransport extends HttpTransport {
 
   public YouTube createMockYoutube() {
@@ -22,82 +52,57 @@ public final class MockHttpTransport extends HttpTransport {
         .build();
   }
 
-  public void setResponse(String response, String method, String api, List<String> params) {
-    setResponse(response, method, api, params.stream().map(this::toEntry).collect(toImmutableMap(Map.Entry::getKey, Map.Entry::getValue)));
-  }
-
-  public void setResponse(String response, String method, String api, Map<String, String> params) {
-    HttpUrl.Builder builder = new HttpUrl.Builder();
-    params.forEach(builder::addQueryParameter);
-    HttpUrl url = builder
-        .scheme("https")
-        .host("www.googleapis.com")
-        .addPathSegment("youtube")
-        .addPathSegment("v3")
-        .addPathSegment(api)
-        .build();
-    mockResponses.put(new Key(method, url), response);
-  }
-
   @Override
   protected LowLevelHttpRequest buildRequest(String method, String url) {
-    return new MockHttpRequest(mockResponses.get(new Key(method, url)));
+    return new MockHttpRequest(findResponse(url));
   }
 
-  private final Map<MockHttpTransport.Key, String> mockResponses = new HashMap<>();
+  public MockHttpTransport(Class<?> testClass) {
+    this.responses = parseResponses(Objects.requireNonNull(testClass));
+  }
 
-  private Map.Entry<String, String> toEntry(String query) {
-    return Maps.immutableEntry(
-        StringUtils.substringBefore(query, "="),
-        StringUtils.substringAfterLast(query, "=")
-    );
+  private final List<MockHttpResponse> responses;
+
+  private List<MockHttpResponse> parseResponses(Class<?> testClass) {
+    String resourceName = deriveResourceName(testClass);
+    try (InputStream resourceContainingResponses = getResourceContainingResponses(testClass, resourceName)) {
+      return parseResponses(resourceContainingResponses);
+    } catch (IOException e) {
+      throw new AssertionError("An error occurred while trying to read resource '" + resourceName + "' derived from " + testClass, e);
+    }
+  }
+
+  private String deriveResourceName(Class<?> testClass) {
+    String expectedResourceName = testClass.getSimpleName();
+    if (expectedResourceName.endsWith("Test"))
+      expectedResourceName = StringUtils.substringBeforeLast(expectedResourceName, "Test");
+
+    return StringUtils.uncapitalize(expectedResourceName) + ".mockhttp";
+  }
+
+  private InputStream getResourceContainingResponses(Class<?> testClass, String resourceName) {
+    InputStream resourceContainingResponses = testClass.getResourceAsStream(resourceName);
+    if (resourceContainingResponses == null)
+      throw new AssertionError("Could not find resource '" + resourceName + "' derived from " + testClass);
+
+    return resourceContainingResponses;
+  }
+
+  private List<MockHttpResponse> parseResponses(InputStream resourceContainingResponses) throws IOException {
+    return new MockHttpResponseParser(IOUtils.readLines(resourceContainingResponses, UTF_8)).parseLines();
+  }
+
+  private MockHttpResponse findResponse(String url) {
+    HttpUrl httpUrl = HttpUrl.parse(url);
+    if (httpUrl == null)
+      throw new AssertionError("Invalid URL passed into HttpTransport: " + url);
+
+    return responses.stream()
+        .filter(response -> response.matches(httpUrl))
+        .findFirst()
+        .orElseThrow(() -> new AssertionError("Could not find any response that matches URL: " + httpUrl));
   }
 
   private static final JacksonFactory JSON_FACTORY = new JacksonFactory();
-
-  private static final class Key {
-    private Key(String method, String url) {
-      this(method, HttpUrl.get(url));
-    }
-
-    private Key(String method, HttpUrl url) {
-      this.method = Require.notBlank(method, titled("method")).toUpperCase();
-      this.url = sortQuery(url);
-    }
-
-    private final String method;
-    private final HttpUrl url;
-
-    private HttpUrl sortQuery(HttpUrl url) {
-      TreeMap<String, String> sortedQueryParams = new TreeMap<>();
-      for (int i = 0; i < url.querySize(); i ++) {
-        sortedQueryParams.put(url.queryParameterName(i), url.queryParameterValue(i));
-      }
-      HttpUrl.Builder builder = url.newBuilder();
-      url.queryParameterNames().forEach(builder::removeAllQueryParameters);
-      url.queryParameterNames().forEach(builder::removeAllEncodedQueryParameters);
-      sortedQueryParams.forEach(builder::addQueryParameter);
-      return builder.build();
-    }
-
-    @Override
-    public String toString() {
-      return method + " " + url;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-      if (this == o) return true;
-      if (o == null || getClass() != o.getClass()) return false;
-      Key key = (Key)o;
-      return Objects.equals(method, key.method) &&
-          Objects.equals(url, key.url);
-    }
-
-    @Override
-    public int hashCode() {
-      return Objects.hash(method, url);
-    }
-  }
 
 }
