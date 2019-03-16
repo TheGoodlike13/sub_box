@@ -1,7 +1,7 @@
 package eu.goodlike.sub.box.http;
 
 import com.google.api.client.http.LowLevelHttpResponse;
-import eu.goodlike.sub.box.util.Require;
+import eu.goodlike.sub.box.util.require.Require;
 import okhttp3.MediaType;
 import okhttp3.OkHttpClient;
 import okhttp3.Response;
@@ -11,7 +11,7 @@ import okhttp3.internal.http.StatusLine;
 import java.io.InputStream;
 import java.util.Optional;
 
-import static eu.goodlike.sub.box.util.Require.titled;
+import static eu.goodlike.sub.box.util.require.Require.titled;
 
 /**
  * {@link LowLevelHttpResponse} implemented using {@link OkHttpClient} and related objects. It is used internally by

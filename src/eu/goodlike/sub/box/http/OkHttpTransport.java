@@ -1,7 +1,7 @@
 package eu.goodlike.sub.box.http;
 
 import com.google.api.client.http.HttpTransport;
-import eu.goodlike.sub.box.util.Require;
+import eu.goodlike.sub.box.util.require.Require;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 
-import static eu.goodlike.sub.box.util.Require.titled;
+import static eu.goodlike.sub.box.util.require.Require.titled;
 
 /**
  * {@link HttpTransport} implementation which uses {@link OkHttpClient} to create and make HTTP requests. Just like

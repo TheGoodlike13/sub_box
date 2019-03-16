@@ -3,8 +3,8 @@ package eu.goodlike.sub.box.youtube;
 import com.google.api.services.youtube.model.SearchResult;
 import org.junit.jupiter.api.Test;
 
-import static eu.goodlike.test.asserts.Asserts.assertInvalidBlank;
-import static eu.goodlike.test.asserts.Asserts.assertInvalidNull;
+import static eu.goodlike.test.asserts.Asserts.assertNotBlank;
+import static eu.goodlike.test.asserts.Asserts.assertNotNull;
 import static eu.goodlike.test.mocks.youtube.ChannelMocks.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -12,14 +12,14 @@ public class YoutubeChannelTest {
 
   @Test
   public void nullSearchResult() {
-    assertInvalidNull("searchResult", YoutubeChannel::new);
-    assertInvalidNull("snippet", any -> new YoutubeChannel(new SearchResult()));
+    assertNotNull("searchResult", YoutubeChannel::new);
+    assertNotNull("snippet", any -> new YoutubeChannel(new SearchResult()));
   }
 
   @Test
   public void noBlankSearchResultContents() {
-    assertInvalidBlank("channelId", input -> toYoutubeChannel(input, "any"));
-    assertInvalidBlank("channelTitle", input -> toYoutubeChannel("any", input));
+    assertNotBlank("channelId", input -> toYoutubeChannel(input, "any"));
+    assertNotBlank("channelTitle", input -> toYoutubeChannel("any", input));
   }
 
   @Test

@@ -9,8 +9,8 @@ import org.mockito.Mockito;
 import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
-import static eu.goodlike.test.asserts.Asserts.assertInvalidBlank;
-import static eu.goodlike.test.asserts.Asserts.assertInvalidNull;
+import static eu.goodlike.test.asserts.Asserts.assertNotBlank;
+import static eu.goodlike.test.asserts.Asserts.assertNotNull;
 import static eu.goodlike.test.mocks.OkHttpMocks.basicRequest;
 import static eu.goodlike.test.mocks.OkHttpMocks.basicResponse;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -37,9 +37,9 @@ public class OkHttpRequestTest {
 
   @Test
   public void nullInputs() {
-    assertInvalidNull("client", (OkHttpClient client) -> new OkHttpRequest(client, request, "any"));
-    assertInvalidNull("request", (Request.Builder request) -> new OkHttpRequest(clientMock, request, "any"));
-    assertInvalidBlank("method", blank -> new OkHttpRequest(clientMock, request, blank));
+    assertNotNull("client", (OkHttpClient client) -> new OkHttpRequest(client, request, "any"));
+    assertNotNull("request", (Request.Builder request) -> new OkHttpRequest(clientMock, request, "any"));
+    assertNotBlank("method", blank -> new OkHttpRequest(clientMock, request, blank));
   }
 
   @Test

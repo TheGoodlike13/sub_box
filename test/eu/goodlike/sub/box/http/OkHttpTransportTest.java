@@ -12,7 +12,7 @@ import org.mockito.Mockito;
 import java.io.File;
 import java.io.IOException;
 
-import static eu.goodlike.test.asserts.Asserts.assertInvalidNull;
+import static eu.goodlike.test.asserts.Asserts.assertNotNull;
 import static eu.goodlike.test.mocks.OkHttpMocks.basicRequest;
 import static eu.goodlike.test.mocks.OkHttpMocks.basicUrl;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -25,7 +25,7 @@ public class OkHttpTransportTest {
 
   @Test
   public void nullInputs() {
-    assertInvalidNull("client", OkHttpTransport::new);
+    assertNotNull("client", OkHttpTransport::new);
   }
 
   @Test

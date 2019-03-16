@@ -4,7 +4,7 @@ import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.LowLevelHttpRequest;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
-import eu.goodlike.sub.box.util.Require;
+import eu.goodlike.sub.box.util.require.Require;
 import okhttp3.HttpUrl;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -13,7 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
-import static eu.goodlike.sub.box.util.Require.titled;
+import static eu.goodlike.sub.box.util.require.Require.titled;
 import static java.nio.charset.StandardCharsets.UTF_8;
 
 /**

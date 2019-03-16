@@ -19,13 +19,13 @@ public class YoutubeChannelSearchTest {
 
   @Test
   public void nullInputs() {
-    assertInvalidNull("youtube", YoutubeChannelSearch::new);
+    assertNotNull("youtube", YoutubeChannelSearch::new);
   }
 
   @Test
   public void invalidSearches() {
-    assertInvalidBlank("searchQuery", query -> search.doSearch(query, 1));
-    assertInvalidNegativeOrZero("maxResults", maxResults -> search.doSearch("any", maxResults));
+    assertNotBlank("searchQuery", query -> search.doSearch(query, 1));
+    assertPositive("maxResults", maxResults -> search.doSearch("any", maxResults));
   }
 
   @Test

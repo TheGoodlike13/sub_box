@@ -7,7 +7,7 @@ import org.mockito.Mockito;
 
 import java.util.function.Function;
 
-import static eu.goodlike.test.asserts.Asserts.assertInvalidNull;
+import static eu.goodlike.test.asserts.Asserts.assertNotNull;
 import static eu.goodlike.test.mocks.OkHttpMocks.basicResponse;
 import static eu.goodlike.test.mocks.OkHttpMocks.toBody;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -17,7 +17,7 @@ public class OkHttpResponseTest {
 
   @Test
   public void nullInputs() {
-    assertInvalidNull("response", OkHttpResponse::new);
+    assertNotNull("response", OkHttpResponse::new);
   }
 
   @Test
