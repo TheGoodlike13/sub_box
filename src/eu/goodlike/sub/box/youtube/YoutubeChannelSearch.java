@@ -45,6 +45,7 @@ public final class YoutubeChannelSearch implements Search {
   }
 
   private List<Result> mapResult(SearchListResponse result) {
+    // TODO: WTF it returns same channel multiple times???
     return result.getItems().stream()
         .map(YoutubeChannel::new)
         .collect(toImmutableList());
