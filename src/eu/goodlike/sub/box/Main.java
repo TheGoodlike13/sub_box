@@ -17,7 +17,12 @@ import java.util.Scanner;
 public final class Main implements AutoCloseable {
 
   public static void main(String... args) throws IOException {
-    try (Main main = new Main()) {
+    String maxResultsArg = args == null || args.length < 1
+        ? DEFAULT_MAX_RESULTS
+        : args[0];
+    int maxResults = Integer.parseInt(maxResultsArg);
+
+    try (Main main = new Main(maxResults)) {
       main.run();
     }
 
@@ -37,7 +42,9 @@ public final class Main implements AutoCloseable {
     transport.shutdown();
   }
 
-  public Main() {
+  public Main(int maxResults) {
+    this.maxResults = maxResults;
+
     OkHttpClient client = new OkHttpClient.Builder()
         .addInterceptor(new YoutubeApiKeyProvider(PUBLIC_API_KEY))
         .build();
@@ -49,19 +56,22 @@ public final class Main implements AutoCloseable {
     this.channelSearch = new YoutubeChannelSearch(youtube);
   }
 
+  private final int maxResults;
   private final HttpTransport transport;
   private final Search channelSearch;
 
   private void performSearch(String input) throws IOException {
-    channelSearch.doSearch(input, 1).forEach(this::printSearchResult);
+    channelSearch.doSearch(input, maxResults).forEach(this::printSearchResult);
   }
 
   private void printSearchResult(Result result) {
     System.out.println("Found channel: " + result.getTitle() + " @" + result.getUrl());
   }
 
-  private static final Scanner INPUT_READER = new Scanner(System.in);
+  private static final String DEFAULT_MAX_RESULTS = "13";
   private static final String PUBLIC_API_KEY = "AIzaSyC7Z0dhCTFFR_0Gt4YpuFjIlmEPFuvqpg8";
+
+  private static final Scanner INPUT_READER = new Scanner(System.in);
 
   private static String readInput() {
     System.out.print("Search query: ");
