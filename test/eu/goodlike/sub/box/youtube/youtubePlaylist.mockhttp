@@ -9,4 +9,12 @@ playlistItems
   http/playlistPage1.json
   playlistId=massive
 
+  http/error/deletedPlaylist.json
+  playlistId=deleted
+  404 Not Found
+
+  http/error/privatePlaylist.json
+  playlistId=private
+  403 Forbidden
+
   http/noResults.json

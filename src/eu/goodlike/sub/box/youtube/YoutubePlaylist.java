@@ -1,5 +1,6 @@
 package eu.goodlike.sub.box.youtube;
 
+import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.PlaylistItemListResponse;
 import eu.goodlike.sub.box.list.Playlist;
@@ -46,8 +47,10 @@ public final class YoutubePlaylist implements Playlist {
   private PlaylistItemListResponse tryGetPlaylistPage(String pageToken) {
     try {
       return getPlaylistPage(pageToken);
+    } catch (GoogleJsonResponseException e) {
+      throw new IllegalStateException(String.valueOf(e.getDetails()), e);
     } catch (IOException e) {
-      throw new IllegalStateException(e);
+      throw new IllegalStateException("Unexpected error", e);
     }
   }
 

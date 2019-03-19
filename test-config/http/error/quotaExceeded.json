@@ -1,9 +1,12 @@
 {
-  "code": 403,
-  "errors": [
-    {
-      "reason": "quotaExceeded"
-    }
-  ],
-  "message": "The request cannot be completed because you have exceeded your quota."
+  "error": {
+    "errors": [
+      {
+        "message" : "The request cannot be completed because you have exceeded your quota.",
+        "reason" : "quotaExceeded"
+      }
+    ],
+    "code" : 403,
+    "message" : "The request cannot be completed because you have exceeded your quota."
+  }
 }
