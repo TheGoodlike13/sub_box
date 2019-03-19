@@ -40,7 +40,7 @@ public final class YoutubeChannelSearch implements Search {
       return search.execute();
     }
     catch (GoogleJsonResponseException e) {
-      throw new IllegalStateException(e);
+      throw new YoutubeWarningException(e);
     }
   }
 

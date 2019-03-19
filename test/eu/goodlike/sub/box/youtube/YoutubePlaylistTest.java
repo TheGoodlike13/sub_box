@@ -52,7 +52,7 @@ public class YoutubePlaylistTest {
   public void deletedPlaylist() {
     Playlist deleted = new YoutubePlaylist(youtube, "deleted");
 
-    assertThatExceptionOfType(IllegalStateException.class)
+    assertThatExceptionOfType(YoutubeWarningException.class)
         .isThrownBy(deleted::getVideos)
         .withMessageContaining("The playlist identified with the requests playlistId parameter cannot be found.");
   }
@@ -61,7 +61,7 @@ public class YoutubePlaylistTest {
   public void privatePlaylist() {
     Playlist privatePlaylist = new YoutubePlaylist(youtube, "private");
 
-    assertThatExceptionOfType(IllegalStateException.class)
+    assertThatExceptionOfType(YoutubeWarningException.class)
         .isThrownBy(privatePlaylist::getVideos)
         .withMessageContaining("The request is not properly authorized to retrieve the specified playlist.");
   }

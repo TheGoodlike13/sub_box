@@ -48,7 +48,7 @@ public final class YoutubePlaylist implements Playlist {
     try {
       return getPlaylistPage(pageToken);
     } catch (GoogleJsonResponseException e) {
-      throw new IllegalStateException(String.valueOf(e.getDetails()), e);
+      throw new YoutubeWarningException(e);
     } catch (IOException e) {
       throw new IllegalStateException("Unexpected error", e);
     }
