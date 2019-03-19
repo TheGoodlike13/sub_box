@@ -16,7 +16,7 @@ public final class YoutubeApiKeyProvider implements Interceptor {
 
   @Override
   public Response intercept(Chain chain) throws IOException {
-    return chain.proceed(appendYoutubeApiKey(chain.request()));
+    return chain.proceed(addApiKeyIfNeeded(chain.request()));
   }
 
   public YoutubeApiKeyProvider(String apiKey) {
@@ -25,38 +25,38 @@ public final class YoutubeApiKeyProvider implements Interceptor {
 
   private final String apiKey;
 
-  private Request appendYoutubeApiKey(Request request) {
-    return needsYoutubeApiKey(request.url())
-        ? appendApiKey(request)
+  private Request addApiKeyIfNeeded(Request request) {
+    return needsApiKey(request.url())
+        ? addApiKey(request)
         : request;
   }
 
-  private boolean needsYoutubeApiKey(HttpUrl url) {
-    return isYoutubeApiRequest(url) && !alreadyHasKey(url);
+  private boolean needsApiKey(HttpUrl url) {
+    return isApiRequest(url) && !alreadyHasKey(url);
   }
 
-  private boolean isYoutubeApiRequest(HttpUrl url) {
-    return url.host().equals(YOUTUBE_API_HOST) && url.pathSegments().containsAll(YOUTUBE_API_PATH);
+  private boolean isApiRequest(HttpUrl url) {
+    return url.host().equals(API_HOST) && url.pathSegments().containsAll(API_PATHS);
   }
 
   private boolean alreadyHasKey(HttpUrl url) {
     return url.queryParameterNames().contains(API_KEY_PARAM_NAME);
   }
 
-  private Request appendApiKey(Request request) {
+  private Request addApiKey(Request request) {
     return request.newBuilder()
-        .url(appendApiKey(request.url()))
+        .url(addApiKeyParam(request.url()))
         .build();
   }
 
-  private HttpUrl appendApiKey(HttpUrl url) {
+  private HttpUrl addApiKeyParam(HttpUrl url) {
     return url.newBuilder()
     .setQueryParameter(API_KEY_PARAM_NAME, apiKey)
     .build();
   }
 
-  private static final String YOUTUBE_API_HOST = "www.googleapis.com";
-  private static final Set<String> YOUTUBE_API_PATH = ImmutableSet.of("youtube", "v3");
+  private static final String API_HOST = "www.googleapis.com";
+  private static final Set<String> API_PATHS = ImmutableSet.of("youtube", "v3");
 
   private static final String API_KEY_PARAM_NAME = "key";
 
