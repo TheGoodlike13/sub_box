@@ -1,0 +1,12 @@
+playlistItems
+  http/osuVideo.json
+  playlistId=small
+
+  http/osuVideo.json
+  playlistId=massive
+  pageToken=CAEQAA
+
+  http/playlistPage1.json
+  playlistId=massive
+
+  http/noResults.json
