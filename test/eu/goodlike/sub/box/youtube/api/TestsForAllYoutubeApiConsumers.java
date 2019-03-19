@@ -2,6 +2,7 @@ package eu.goodlike.sub.box.youtube.api;
 
 import com.google.api.services.youtube.YouTube;
 import eu.goodlike.sub.box.youtube.YoutubeChannelSearch;
+import eu.goodlike.sub.box.youtube.YoutubePlaylist;
 import eu.goodlike.test.mocks.http.MockHttpTransport;
 import org.junit.jupiter.api.extension.ExtensionContext;
 import org.junit.jupiter.api.function.ThrowingConsumer;
@@ -19,7 +20,8 @@ public class TestsForAllYoutubeApiConsumers implements ArgumentsProvider {
   @Override
   public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
     return Stream.of(
-        Arguments.of("youtubeChannelSearch", youtubeChannelSearch())
+        Arguments.of("youtubeChannelSearch", youtubeChannelSearch()),
+        Arguments.of("playlistItems", playlistItems())
     );
   }
 
@@ -28,11 +30,16 @@ public class TestsForAllYoutubeApiConsumers implements ArgumentsProvider {
   public void handleQuotaExceeded(String apiDescription, ThrowingConsumer<YouTube> apiCall) {
     YouTube mockTube = new MockHttpTransport(TestsForAllYoutubeApiConsumers.class, "quotaExceeded.mockhttp").createMockYoutube();
     assertThatExceptionOfType(IllegalStateException.class)  // TODO: improve the mechanism for handling API errors
-        .isThrownBy(() -> apiCall.accept(mockTube));
+        .isThrownBy(() -> apiCall.accept(mockTube))
+        .withMessageContaining("The request cannot be completed because you have exceeded your quota.");
   }
 
   private ThrowingConsumer<YouTube> youtubeChannelSearch() {
     return youtube -> new YoutubeChannelSearch(youtube).doSearch("any", 1);
+  }
+
+  private ThrowingConsumer<YouTube> playlistItems() {
+    return youtube -> new YoutubePlaylist(youtube, "any").getVideos().toArray();
   }
 
 }
