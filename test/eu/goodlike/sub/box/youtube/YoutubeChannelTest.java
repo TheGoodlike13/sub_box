@@ -11,7 +11,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class YoutubeChannelTest {
 
   @Test
-  public void nullSearchResult() {
+  public void nullInput() {
     assertNotNull("searchResult", YoutubeChannel::new);
     assertNotNull("snippet", any -> new YoutubeChannel(new SearchResult()));
   }
