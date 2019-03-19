@@ -16,7 +16,7 @@ public final class YoutubeApiKeyProvider implements Interceptor {
 
   @Override
   public Response intercept(Chain chain) throws IOException {
-    return chain.proceed(addApiKeyIfNeeded(chain.request()));
+    return chain.proceed(addApiKey(chain.request()));
   }
 
   public YoutubeApiKeyProvider(String apiKey) {
@@ -25,31 +25,31 @@ public final class YoutubeApiKeyProvider implements Interceptor {
 
   private final String apiKey;
 
-  private Request addApiKeyIfNeeded(Request request) {
+  private Request addApiKey(Request request) {
     return needsApiKey(request.url())
-        ? addApiKey(request)
+        ? setApiKey(request)
         : request;
   }
 
   private boolean needsApiKey(HttpUrl url) {
-    return isApiRequest(url) && !alreadyHasKey(url);
+    return isApiRequest(url) && !alreadyHasApiKey(url);
   }
 
   private boolean isApiRequest(HttpUrl url) {
     return url.host().equals(API_HOST) && url.pathSegments().containsAll(API_PATHS);
   }
 
-  private boolean alreadyHasKey(HttpUrl url) {
+  private boolean alreadyHasApiKey(HttpUrl url) {
     return url.queryParameterNames().contains(API_KEY_PARAM_NAME);
   }
 
-  private Request addApiKey(Request request) {
+  private Request setApiKey(Request request) {
     return request.newBuilder()
-        .url(addApiKeyParam(request.url()))
+        .url(setApiKeyParam(request.url()))
         .build();
   }
 
-  private HttpUrl addApiKeyParam(HttpUrl url) {
+  private HttpUrl setApiKeyParam(HttpUrl url) {
     return url.newBuilder()
     .setQueryParameter(API_KEY_PARAM_NAME, apiKey)
     .build();
