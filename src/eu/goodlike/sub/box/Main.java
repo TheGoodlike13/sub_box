@@ -61,7 +61,10 @@ public final class Main implements AutoCloseable {
   private List<Channel> channels;
 
   private void interpretInputAndPerformAppropriateTask(String input) throws IOException {
-    performChannelSearch(input);
+    if (input.startsWith("q="))
+      performChannelSearch(input.substring(2));
+    else
+      System.out.println("Unknown query. Try again!");
   }
 
   private void performChannelSearch(String input) throws IOException {
