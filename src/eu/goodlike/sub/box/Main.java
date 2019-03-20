@@ -97,6 +97,8 @@ public final class Main implements AutoCloseable {
     System.out.println("q=<anyString>");
     System.out.println("  Search for channel");
     System.out.println("  Example: q=TheGoodlike13");
+    System.out.println();
+    System.out.println("Empty query will exit the program loop.");
   }
 
   private static String readInput() {
