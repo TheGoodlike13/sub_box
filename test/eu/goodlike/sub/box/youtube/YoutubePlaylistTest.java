@@ -25,6 +25,13 @@ public class YoutubePlaylistTest {
   }
 
   @Test
+  public void getId() {
+    Playlist any = new YoutubePlaylist(youtube, "any");
+
+    assertThat(any.getId()).isEqualTo("any");
+  }
+
+  @Test
   public void emptyPlaylist() {
     Playlist empty = new YoutubePlaylist(youtube, "empty");
 

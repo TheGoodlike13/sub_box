@@ -1,5 +1,5 @@
 search
-  http/thegoodlike13.json
+  http/thegoodlike13_search.json
   q=let's code
 
   http/noResults.json

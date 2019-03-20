@@ -27,6 +27,7 @@ public class YoutubeVideoTest {
   public void getters() {
     YoutubeVideo channel = getOsuVideo();
 
+    assertThat(channel.getId()).isEqualTo(OSU_VIDEO_ID);
     assertThat(channel.getUrl()).isEqualTo(OSU_VIDEO_URL);
     assertThat(channel.getTitle()).isEqualTo(OSU_VIDEO_TITLE);
   }

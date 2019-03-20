@@ -10,7 +10,12 @@ import java.util.Objects;
 
 import static eu.goodlike.sub.box.util.require.Require.titled;
 
-public final class YoutubeChannel implements Result {
+public final class YoutubeChannelSearchResult implements Result {
+
+  @Override
+  public String getId() {
+    return getChannelId();
+  }
 
   @Override
   public String getTitle() {
@@ -22,7 +27,7 @@ public final class YoutubeChannel implements Result {
     return HttpUrl.parse(CHANNEL_URL_PREFIX + getChannelId());
   }
 
-  public YoutubeChannel(SearchResult searchResult) {
+  public YoutubeChannelSearchResult(SearchResult searchResult) {
     this.searchResult = Require.notNull(searchResult, titled("searchResult"));
     assertResponsePopulated();
   }
@@ -57,7 +62,7 @@ public final class YoutubeChannel implements Result {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    YoutubeChannel that = (YoutubeChannel)o;
+    YoutubeChannelSearchResult that = (YoutubeChannelSearchResult)o;
     return Objects.equals(getTitle(), that.getTitle()) &&
         Objects.equals(getUrl(), that.getUrl());
   }

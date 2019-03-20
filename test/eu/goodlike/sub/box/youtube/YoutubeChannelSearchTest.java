@@ -1,7 +1,8 @@
 package eu.goodlike.sub.box.youtube;
 
-import eu.goodlike.sub.box.search.Result;
-import eu.goodlike.sub.box.search.Search;
+import com.google.api.services.youtube.YouTube;
+import eu.goodlike.sub.box.channel.Channel;
+import eu.goodlike.sub.box.channel.ChannelSearch;
 import eu.goodlike.test.mocks.http.MockHttpTransport;
 import org.junit.jupiter.api.Test;
 
@@ -9,13 +10,14 @@ import java.io.IOException;
 import java.util.List;
 
 import static eu.goodlike.test.asserts.Asserts.*;
-import static eu.goodlike.test.mocks.youtube.ChannelMocks.getGoodlikeChannel;
+import static eu.goodlike.test.mocks.youtube.ChannelMocks.getGoodlikeChannelResult;
 import static org.assertj.core.api.Assertions.assertThat;
 
 public class YoutubeChannelSearchTest {
 
   private final MockHttpTransport mockHttpTransport = new MockHttpTransport(YoutubeChannelSearchTest.class);
-  private final Search search = new YoutubeChannelSearch(mockHttpTransport.createMockYoutube());
+  private final YouTube youtube = mockHttpTransport.createMockYoutube();
+  private final ChannelSearch search = new YoutubeChannelSearch(youtube);
 
   @Test
   public void nullInputs() {
@@ -30,16 +32,16 @@ public class YoutubeChannelSearchTest {
 
   @Test
   public void noSearchResults() throws IOException {
-    List<Result> searchResults = search.doSearch("definitely produces no results", 1);
+    List<Channel> searchResults = search.doSearch("definitely produces no results", 1);
 
     assertThat(searchResults).isNotNull().isEmpty();
   }
 
   @Test
   public void performYoutubeSearch() throws IOException {
-    List<Result> searchResults = search.doSearch("let's code", 1);
+    List<Channel> searchResults = search.doSearch("let's code", 1);
 
-    assertThat(searchResults).containsExactly(getGoodlikeChannel());
+    assertThat(searchResults).containsExactly(new YoutubeChannelViaSearch(youtube, getGoodlikeChannelResult()));
   }
 
 }

@@ -3,8 +3,8 @@ package eu.goodlike.sub.box.youtube;
 import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.SearchListResponse;
-import eu.goodlike.sub.box.search.Result;
-import eu.goodlike.sub.box.search.Search;
+import eu.goodlike.sub.box.channel.Channel;
+import eu.goodlike.sub.box.channel.ChannelSearch;
 import eu.goodlike.sub.box.util.require.Require;
 
 import java.io.IOException;
@@ -13,10 +13,10 @@ import java.util.List;
 import static com.google.common.collect.ImmutableList.toImmutableList;
 import static eu.goodlike.sub.box.util.require.Require.titled;
 
-public final class YoutubeChannelSearch implements Search {
+public final class YoutubeChannelSearch implements ChannelSearch {
 
   @Override
-  public List<Result> doSearch(String searchQuery, int maxResults) throws IOException {
+  public List<Channel> doSearch(String searchQuery, int maxResults) throws IOException {
     Require.notBlank(searchQuery, titled("searchQuery"));
     Require.positive(maxResults, titled("maxResults"));
 
@@ -44,10 +44,11 @@ public final class YoutubeChannelSearch implements Search {
     }
   }
 
-  private List<Result> mapResult(SearchListResponse result) {
+  private List<Channel> mapResult(SearchListResponse result) {
     // TODO: WTF it returns same channel multiple times???
     return result.getItems().stream()
-        .map(YoutubeChannel::new)
+        .map(YoutubeChannelSearchResult::new)
+        .map(searchResult -> new YoutubeChannelViaSearch(youtube, searchResult))
         .collect(toImmutableList());
   }
 

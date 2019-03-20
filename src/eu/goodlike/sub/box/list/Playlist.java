@@ -6,6 +6,8 @@ import java.util.stream.Stream;
 
 public interface Playlist {
 
+  String getId();
+
   Stream<Result> getVideos();
 
 }

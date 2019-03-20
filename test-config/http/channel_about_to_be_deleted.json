@@ -1,0 +1,15 @@
+{
+  "items": [
+    {
+      "id": "almostDeleted",
+      "snippet": {
+        "title": "About to be deleted"
+      },
+      "contentDetails": {
+        "relatedPlaylists": {
+          "uploads": "deletedPlaylist"
+        }
+      }
+    }
+  ]
+}

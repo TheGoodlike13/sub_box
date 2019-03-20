@@ -13,6 +13,11 @@ import static eu.goodlike.sub.box.util.require.Require.titled;
 public final class YoutubeVideo implements Result {
 
   @Override
+  public String getId() {
+    return getVideoId();
+  }
+
+  @Override
   public String getTitle() {
     return getVideoTitle();
   }
