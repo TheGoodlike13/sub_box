@@ -7,13 +7,18 @@ import eu.goodlike.sub.box.channel.Channel;
 import eu.goodlike.sub.box.channel.ChannelSearch;
 import eu.goodlike.sub.box.http.OkHttpTransport;
 import eu.goodlike.sub.box.http.YoutubeApiKeyProvider;
+import eu.goodlike.sub.box.search.Result;
 import eu.goodlike.sub.box.youtube.YoutubeChannelSearch;
+import eu.goodlike.sub.box.youtube.YoutubeWarningException;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.Stream;
+
+import static com.google.common.collect.ImmutableList.toImmutableList;
 
 public final class Main implements AutoCloseable {
 
@@ -63,22 +68,66 @@ public final class Main implements AutoCloseable {
   private void interpretInputAndPerformAppropriateTask(String input) throws IOException {
     if (input.startsWith("q="))
       performChannelSearch(input.substring(2));
+    else if (input.startsWith("p="))
+      showUploadsForPosition(input.substring(2));
     else
       System.out.println("Unknown query. Try again!");
   }
 
-  private void performChannelSearch(String input) throws IOException {
-    this.channels = channelSearch.doSearch(input, maxResults);
-    printChannelSearchResult();
+  private void performChannelSearch(String channelSearchQuery) throws IOException {
+    this.channels = channelSearch.doSearch(channelSearchQuery, maxResults);
+    printChannels();
   }
 
-  private void printChannelSearchResult() {
-    int indexSize = String.valueOf(channels.size()).length();
+  private void printChannels() {
+    print(channels, "Found channel");
+  }
+
+  private void showUploadsForPosition(String positionNumber) {
+    if (channels == null)
+      System.out.println("Please perform at least one search before using position query.");
+    else {
+      int position = getPosition(positionNumber);
+      if (position <= 0)
+        System.out.println("Query did not contain a valid number. Position must be positive.");
+      else if (channels.size() < position)
+        System.out.println("Position is too large (last search returned " + channels.size() + " elements).");
+      else
+        printUploads(channels.get(position - 1));
+    }
+  }
+
+  private int getPosition(String positionNumber) {
+    try {
+      return Integer.parseInt(positionNumber);
+    }
+    catch (NumberFormatException e) {
+      return 0;
+    }
+  }
+
+  private void printUploads(Channel channel) {
+    List<Result> videos = getUploads(channel).collect(toImmutableList());
+    print(videos, "Uploaded video");
+  }
+
+  private Stream<Result> getUploads(Channel channel) {
+    try {
+      return channel.getUploadedVideos();
+    }
+    catch (YoutubeWarningException e) {
+      System.out.println("Cannot get uploaded videos for channel " + channel.getTitle() + ": " + e.getMessage());
+      return Stream.empty();
+    }
+  }
+
+  private void print(List<? extends Result> printables, String printableDescription) {
+    int indexSize = String.valueOf(printables.size()).length();
 
     int position = 1;
-    for (Channel channel : channels) {
+    for (Result printable : printables) {
       String positionString = StringUtils.leftPad(String.valueOf(position++), indexSize);
-      System.out.println("Found channel " + positionString + ": " + channel.getTitle() + " @" + channel.getUrl());
+      System.out.println(printableDescription + " " + positionString + ": " + printable.getTitle() + " @" + printable.getUrl());
     }
   }
 
@@ -97,9 +146,13 @@ public final class Main implements AutoCloseable {
   private static void printIntroduction() {
     System.out.println("Supported queries:");
     System.out.println();
-    System.out.println("q=<anyString>");
+    System.out.println("q=<channelSearchQuery>");
     System.out.println("  Search for channel");
     System.out.println("  Example: q=TheGoodlike13");
+    System.out.println();
+    System.out.println("p=<positionNumber>");
+    System.out.println("  Retrieve uploads for channel from last search, by position");
+    System.out.println("  Example: p=1");
     System.out.println();
     System.out.println("Empty query will exit the program loop.");
   }
