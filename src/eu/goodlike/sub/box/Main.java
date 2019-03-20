@@ -3,24 +3,24 @@ package eu.goodlike.sub.box;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
+import eu.goodlike.sub.box.channel.Channel;
+import eu.goodlike.sub.box.channel.ChannelSearch;
 import eu.goodlike.sub.box.http.OkHttpTransport;
 import eu.goodlike.sub.box.http.YoutubeApiKeyProvider;
-import eu.goodlike.sub.box.search.Result;
-import eu.goodlike.sub.box.search.Search;
 import eu.goodlike.sub.box.youtube.YoutubeChannelSearch;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Scanner;
 
 public final class Main implements AutoCloseable {
 
   public static void main(String... args) throws IOException {
-    String maxResultsArg = args == null || args.length < 1
-        ? DEFAULT_MAX_RESULTS
-        : args[0];
-    int maxResults = Integer.parseInt(maxResultsArg);
+    int maxResults = getMaxResultsParam(args);
+
+    printIntroduction();
 
     try (Main main = new Main(maxResults)) {
       main.run();
@@ -30,11 +30,9 @@ public final class Main implements AutoCloseable {
   }
 
   public void run() throws IOException {
-    System.out.println("Channel search");
-
     String input;
     while ((input = readInput()) != null)
-      performSearch(input);
+      interpretInputAndPerformAppropriateTask(input);
   }
 
   @Override
@@ -58,14 +56,27 @@ public final class Main implements AutoCloseable {
 
   private final int maxResults;
   private final HttpTransport transport;
-  private final Search channelSearch;
+  private final ChannelSearch channelSearch;
 
-  private void performSearch(String input) throws IOException {
-    channelSearch.doSearch(input, maxResults).forEach(this::printSearchResult);
+  private List<Channel> channels;
+
+  private void interpretInputAndPerformAppropriateTask(String input) throws IOException {
+    performChannelSearch(input);
   }
 
-  private void printSearchResult(Result result) {
-    System.out.println("Found channel: " + result.getTitle() + " @" + result.getUrl());
+  private void performChannelSearch(String input) throws IOException {
+    this.channels = channelSearch.doSearch(input, maxResults);
+    printChannelSearchResult();
+  }
+
+  private void printChannelSearchResult() {
+    int indexSize = String.valueOf(channels.size()).length();
+
+    int position = 1;
+    for (Channel channel : channels) {
+      String positionString = StringUtils.leftPad(String.valueOf(position++), indexSize);
+      System.out.println("Found channel " + positionString + ": " + channel.getTitle() + " @" + channel.getUrl());
+    }
   }
 
   private static final String DEFAULT_MAX_RESULTS = "13";
@@ -73,8 +84,24 @@ public final class Main implements AutoCloseable {
 
   private static final Scanner INPUT_READER = new Scanner(System.in);
 
+  private static int getMaxResultsParam(String[] args) {
+    String maxResultsArg = args == null || args.length < 1
+        ? DEFAULT_MAX_RESULTS
+        : args[0];
+    return Integer.parseInt(maxResultsArg);
+  }
+
+  private static void printIntroduction() {
+    System.out.println("Supported queries:");
+    System.out.println();
+    System.out.println("q=<anyString>");
+    System.out.println("  Search for channel");
+    System.out.println("  Example: q=TheGoodlike13");
+  }
+
   private static String readInput() {
-    System.out.print("Search query: ");
+    System.out.println();
+    System.out.print("Query: ");
     return StringUtils.trimToNull(INPUT_READER.nextLine());
   }
 
