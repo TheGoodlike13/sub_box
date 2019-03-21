@@ -34,7 +34,7 @@ public final class YoutubeChannelViaSearch implements Channel {
   }
 
   @Override
-  public Stream<Result> getUploadedVideos() {
+  public Stream<Result> getVideos() {
     return getUploadPlaylist().getVideos();
   }
 

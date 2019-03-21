@@ -6,9 +6,13 @@ import com.google.api.services.youtube.YouTube;
 import eu.goodlike.sub.box.channel.Channel;
 import eu.goodlike.sub.box.channel.ChannelSearch;
 import eu.goodlike.sub.box.http.OkHttpTransport;
+import eu.goodlike.sub.box.http.RequestDebug;
 import eu.goodlike.sub.box.http.YoutubeApiKeyProvider;
+import eu.goodlike.sub.box.list.Playlist;
+import eu.goodlike.sub.box.list.PlaylistFactory;
 import eu.goodlike.sub.box.search.Result;
 import eu.goodlike.sub.box.youtube.YoutubeChannelSearch;
+import eu.goodlike.sub.box.youtube.YoutubePlaylistFactory;
 import eu.goodlike.sub.box.youtube.YoutubeWarningException;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
@@ -49,6 +53,7 @@ public final class Main implements AutoCloseable {
     this.maxResults = maxResults;
 
     OkHttpClient client = new OkHttpClient.Builder()
+        .addInterceptor(new RequestDebug())
         .addInterceptor(new YoutubeApiKeyProvider(PUBLIC_API_KEY))
         .build();
     this.transport = new OkHttpTransport(client);
@@ -56,19 +61,24 @@ public final class Main implements AutoCloseable {
     YouTube youtube = new YouTube.Builder(transport, new JacksonFactory(), null)
         .setApplicationName("sub_box")
         .build();
+
     this.channelSearch = new YoutubeChannelSearch(youtube);
+    this.playlistFactory = new YoutubePlaylistFactory(youtube);
   }
 
   private final int maxResults;
   private final HttpTransport transport;
   private final ChannelSearch channelSearch;
+  private final PlaylistFactory playlistFactory;
 
   private List<Channel> channels;
 
   private void interpretInputAndPerformAppropriateTask(String input) throws IOException {
-    if (input.startsWith("q="))
+    if (input.startsWith("c="))
       performChannelSearch(input.substring(2));
     else if (input.startsWith("p="))
+      showVideosForPlaylist(input.substring(2));
+    else if (input.startsWith("n="))
       showUploadsForPosition(input.substring(2));
     else
       System.out.println("Unknown query. Try again!");
@@ -81,6 +91,15 @@ public final class Main implements AutoCloseable {
 
   private void printChannels() {
     print(channels, "Found channel");
+  }
+
+  private void showVideosForPlaylist(String playlistId) {
+    List<Result> playlistVideos = getVideosForPlaylist(playlistId).collect(toImmutableList());
+    print(playlistVideos, "Playlist video");
+  }
+
+  private Stream<Result> getVideosForPlaylist(String playlistId) {
+    return getVideos(playlistFactory.newPlaylist(playlistId), "playlist with id " + playlistId);
   }
 
   private void showUploadsForPosition(String positionNumber) {
@@ -107,16 +126,16 @@ public final class Main implements AutoCloseable {
   }
 
   private void printUploads(Channel channel) {
-    List<Result> videos = getUploads(channel).collect(toImmutableList());
+    List<Result> videos = getVideos(channel, "channel " + channel.getTitle()).collect(toImmutableList());
     print(videos, "Uploaded video");
   }
 
-  private Stream<Result> getUploads(Channel channel) {
+  private Stream<Result> getVideos(Playlist playlist, String playlistDescription) {
     try {
-      return channel.getUploadedVideos();
+      return playlist.getVideos();
     }
     catch (YoutubeWarningException e) {
-      System.out.println("Cannot get uploaded videos for channel " + channel.getTitle() + ": " + e.getMessage());
+      System.out.println("Cannot get videos for " + playlistDescription + ": " + e.getMessage());
       return Stream.empty();
     }
   }
@@ -146,11 +165,15 @@ public final class Main implements AutoCloseable {
   private static void printIntroduction() {
     System.out.println("Supported queries:");
     System.out.println();
-    System.out.println("q=<channelSearchQuery>");
+    System.out.println("c=<channelSearchQuery>");
     System.out.println("  Search for channel");
     System.out.println("  Example: q=TheGoodlike13");
     System.out.println();
-    System.out.println("p=<positionNumber>");
+    System.out.println("p=<playlistId>");
+    System.out.println("  Retrieve videos in playlist, by id");
+    System.out.println("  Example: p=PLh0Ul3zO7LAhXL0wblm4z-uWU4RGxtElv");
+    System.out.println();
+    System.out.println("n=<positionNumber>");
     System.out.println("  Retrieve uploads for channel from last search, by position");
     System.out.println("  Example: p=1");
     System.out.println();
