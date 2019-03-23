@@ -10,9 +10,13 @@ import eu.goodlike.sub.box.http.RequestDebug;
 import eu.goodlike.sub.box.http.YoutubeApiKeyProvider;
 import eu.goodlike.sub.box.list.PlaylistFactory;
 import eu.goodlike.sub.box.search.Search;
+import eu.goodlike.sub.box.video.VideoFinder;
+import eu.goodlike.sub.box.video.VideoItem;
 import eu.goodlike.sub.box.youtube.YoutubeChannelSearch;
 import eu.goodlike.sub.box.youtube.YoutubePlaylistFactory;
+import eu.goodlike.sub.box.youtube.YoutubeVideoFinder;
 import eu.goodlike.sub.box.youtube.YoutubeWarningException;
+import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 
@@ -20,6 +24,7 @@ import java.awt.*;
 import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.util.List;
+import java.util.Optional;
 import java.util.Scanner;
 import java.util.stream.Stream;
 
@@ -63,11 +68,13 @@ public final class Main implements AutoCloseable {
 
     this.channelSearch = new YoutubeChannelSearch(youtube);
     this.playlistFactory = new YoutubePlaylistFactory(youtube);
+    this.videoFinder = new YoutubeVideoFinder(youtube);
   }
 
   private final HttpTransport transport;
   private final ChannelSearch channelSearch;
   private final PlaylistFactory playlistFactory;
+  private final VideoFinder videoFinder;
 
   private int maxResults = DEFAULT_MAX_RESULTS;
   private boolean useBrowser = true;
@@ -84,6 +91,8 @@ public final class Main implements AutoCloseable {
       performChannelSearch(input.substring(2));
     else if (input.startsWith("p="))
       showVideosForPlaylist(input.substring(2));
+    else if (input.startsWith("v="))
+      launchVideoForId(input.substring(2));
     else if (input.startsWith("cn="))
       showUploadsForPosition(input.substring(3));
     else if (input.startsWith("vn="))
@@ -120,6 +129,17 @@ public final class Main implements AutoCloseable {
     return getItems(playlistFactory.newPlaylist(playlistId), "playlist with id " + playlistId);
   }
 
+  private void launchVideoForId(String videoId) {
+    Optional<VideoItem> video = videoFinder.find(videoId);
+    video.ifPresent(this::launchVideo);
+    video.orElseGet(() -> printNoSuchVideo(videoId));
+  }
+
+  private VideoItem printNoSuchVideo(String videoId) {
+    System.out.println("Video with id " + videoId + " has either been deleted, private'd, or never existed in the first place.");
+    return null;
+  }
+
   private void showUploadsForPosition(String positionNumber) {
     if (channels == null)
       System.out.println("Please perform at least one search before using channel position query.");
@@ -146,25 +166,27 @@ public final class Main implements AutoCloseable {
   }
 
   private void launchVideo(SubscriptionItem item) {
+    print(item, "Selected video");
+
     if (isBrowserSupported() && useBrowser)
-      launchInBrowser(item);
+      launchInBrowser(item.getUrl());
     else
-      launchToClipboard(item);
+      copyToClipboard(item.getUrl());
   }
 
-  private void launchInBrowser(SubscriptionItem item) {
+  private void launchInBrowser(HttpUrl url) {
     try {
-      Desktop.getDesktop().browse(item.getUrl().uri());
+      Desktop.getDesktop().browse(url.uri());
       System.out.println("Video URL launched in browser.");
     } catch (IOException e) {
       System.out.println("Could not launch video URL in browser: " + e);
-      launchToClipboard(item);
+      copyToClipboard(url);
     }
   }
 
-  private void launchToClipboard(SubscriptionItem item) {
+  private void copyToClipboard(HttpUrl url) {
     try {
-      StringSelection clipboardData = new StringSelection(item.getUrl().toString());
+      StringSelection clipboardData = new StringSelection(url.toString());
       Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboardData, clipboardData);
       System.out.println("Video URL copied to clipboard.");
     } catch (Exception e) {
@@ -208,8 +230,12 @@ public final class Main implements AutoCloseable {
     int position = 1;
     for (Search.Result printable : printables) {
       String positionString = StringUtils.leftPad(String.valueOf(position++), indexSize);
-      System.out.println(printableDescription + " " + positionString + ": " + printable.getTitle() + " @" + printable.getUrl());
+      print(printable, printableDescription + " " + positionString);
     }
+  }
+
+  private void print(Search.Result printable, String prefix) {
+    System.out.println(prefix + ": " + printable.getTitle() + " @" + printable.getUrl());
   }
 
   private static final int DEFAULT_MAX_RESULTS = 13;
