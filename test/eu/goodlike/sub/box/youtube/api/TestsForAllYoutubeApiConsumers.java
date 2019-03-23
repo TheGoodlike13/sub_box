@@ -2,6 +2,7 @@ package eu.goodlike.sub.box.youtube.api;
 
 import com.google.api.services.youtube.YouTube;
 import eu.goodlike.sub.box.youtube.YoutubeChannelSearch;
+import eu.goodlike.sub.box.youtube.YoutubeChannelViaSearch;
 import eu.goodlike.sub.box.youtube.YoutubePlaylist;
 import eu.goodlike.sub.box.youtube.YoutubeWarningException;
 import eu.goodlike.test.mocks.http.MockHttpTransport;
@@ -14,6 +15,7 @@ import org.junit.jupiter.params.provider.ArgumentsSource;
 
 import java.util.stream.Stream;
 
+import static eu.goodlike.test.mocks.youtube.ChannelMocks.getGoodlikeChannelResult;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
 public class TestsForAllYoutubeApiConsumers implements ArgumentsProvider {
@@ -22,7 +24,8 @@ public class TestsForAllYoutubeApiConsumers implements ArgumentsProvider {
   public Stream<? extends Arguments> provideArguments(ExtensionContext context) {
     return Stream.of(
         Arguments.of("youtubeChannelSearch", youtubeChannelSearch()),
-        Arguments.of("playlistItems", playlistItems())
+        Arguments.of("playlistItems", playlistItems()),
+        Arguments.of("channelInfoAfterSearch", channelInfoAfterSearch())
     );
   }
 
@@ -41,6 +44,10 @@ public class TestsForAllYoutubeApiConsumers implements ArgumentsProvider {
 
   private ThrowingConsumer<YouTube> playlistItems() {
     return youtube -> new YoutubePlaylist(youtube, "any").getVideos().toArray();
+  }
+
+  private ThrowingConsumer<YouTube> channelInfoAfterSearch() {
+    return youtube -> new YoutubeChannelViaSearch(youtube, getGoodlikeChannelResult()).getVideos();
   }
 
 }
