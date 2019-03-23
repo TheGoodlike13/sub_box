@@ -16,6 +16,8 @@ import eu.goodlike.sub.box.youtube.YoutubeWarningException;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 
+import java.awt.*;
+import java.awt.datatransfer.StringSelection;
 import java.io.IOException;
 import java.util.List;
 import java.util.Scanner;
@@ -27,6 +29,8 @@ public final class Main implements AutoCloseable {
 
   public static void main(String... args) throws IOException {
     printIntroduction();
+
+    printDefaultBrowserBehavior();
 
     try (Main main = new Main()) {
       main.run();
@@ -72,14 +76,30 @@ public final class Main implements AutoCloseable {
   private List<SubscriptionItem> items;
 
   private void interpretInputAndPerformAppropriateTask(String input) {
-    if (input.startsWith("c="))
+    if (input.equals("!b"))
+      flipBrowserBehavior();
+    else if (input.startsWith("!max="))
+      setMaxResults(input.substring(5));
+    else if (input.startsWith("c="))
       performChannelSearch(input.substring(2));
     else if (input.startsWith("p="))
       showVideosForPlaylist(input.substring(2));
-    else if (input.startsWith("n="))
-      showUploadsForPosition(input.substring(2));
+    else if (input.startsWith("cn="))
+      showUploadsForPosition(input.substring(3));
+    else if (input.startsWith("vn="))
+      launchVideoForPosition(input.substring(3));
     else
       System.out.println("Unknown query. Try again!");
+  }
+
+  private void flipBrowserBehavior() {
+    this.useBrowser = !this.useBrowser;
+    System.out.println("Setting to use browser: " + useBrowser);
+  }
+
+  private void setMaxResults(String integer) {
+    this.maxResults = Math.max(0, Math.min(getIntOrZero(integer), 50));
+    System.out.println("Max results for search set to " + maxResults);
   }
 
   private void performChannelSearch(String channelSearchQuery) {
@@ -102,30 +122,74 @@ public final class Main implements AutoCloseable {
 
   private void showUploadsForPosition(String positionNumber) {
     if (channels == null)
-      System.out.println("Please perform at least one search before using position query.");
+      System.out.println("Please perform at least one search before using channel position query.");
     else {
-      int position = getPosition(positionNumber);
-      if (position <= 0)
-        System.out.println("Query did not contain a valid number. Position must be positive.");
-      else if (channels.size() < position)
-        System.out.println("Position is too large (last search returned " + channels.size() + " elements).");
-      else
+      Integer position = getPosition(positionNumber, channels.size());
+      if (position != null)
         printUploads(channels.get(position - 1));
-    }
-  }
-
-  private int getPosition(String positionNumber) {
-    try {
-      return Integer.parseInt(positionNumber);
-    }
-    catch (NumberFormatException e) {
-      return 0;
     }
   }
 
   private void printUploads(Channel channel) {
     this.items = getItems(channel, "channel " + channel.getTitle()).collect(toImmutableList());
     print(items, "Uploaded video");
+  }
+
+  private void launchVideoForPosition(String positionNumber) {
+    if (items == null)
+      System.out.println("Please select at least one playlist before using video position query.");
+    else {
+      Integer position = getPosition(positionNumber, items.size());
+      if (position != null)
+        launchVideo(items.get(position - 1));
+    }
+  }
+
+  private void launchVideo(SubscriptionItem item) {
+    if (isBrowserSupported() && useBrowser)
+      launchInBrowser(item);
+    else
+      launchToClipboard(item);
+  }
+
+  private void launchInBrowser(SubscriptionItem item) {
+    try {
+      Desktop.getDesktop().browse(item.getUrl().uri());
+      System.out.println("Video URL launched in browser.");
+    } catch (IOException e) {
+      System.out.println("Could not launch video URL in browser: " + e);
+      launchToClipboard(item);
+    }
+  }
+
+  private void launchToClipboard(SubscriptionItem item) {
+    try {
+      StringSelection clipboardData = new StringSelection(item.getUrl().toString());
+      Toolkit.getDefaultToolkit().getSystemClipboard().setContents(clipboardData, clipboardData);
+      System.out.println("Video URL copied to clipboard.");
+    } catch (Exception e) {
+      System.out.println("Could not copy video URL to clipboard: " + e);
+    }
+  }
+
+  private Integer getPosition(String positionNumber, int max) {
+    int position = getIntOrZero(positionNumber);
+    if (position <= 0)
+      System.out.println("Query did not contain a valid number. Position must be positive.");
+    else if (max < position)
+      System.out.println("Position is too large (there are " + max + " elements).");
+    else
+      return position;
+
+    return null;
+  }
+
+  private int getIntOrZero(String intInput) {
+    try {
+      return Integer.parseInt(intInput);
+    } catch (NumberFormatException e) {
+      return 0;
+    }
   }
 
   private Stream<SubscriptionItem> getItems(Subscribable subscribable, String subscribableDescription) {
@@ -162,11 +226,11 @@ public final class Main implements AutoCloseable {
     System.out.println();
     System.out.println("!b");
     System.out.println("  Flip browser behavior.");
-    System.out.println("  If no browser is available, this option does nothing.");
+    System.out.println("  If no browser is available, this option does nothing. All launches go to clipboard.");
     System.out.println("  If browser is available, switches to using clipboard instead, or back to browser.");
     System.out.println();
     System.out.println("c=<channelSearchQuery>");
-    System.out.println("  Example: q=TheGoodlike13");
+    System.out.println("  Example: c=TheGoodlike13");
     System.out.println("  Search for channel, by any related query.");
     System.out.println();
     System.out.println("p=<playlistId>");
@@ -175,15 +239,30 @@ public final class Main implements AutoCloseable {
     System.out.println();
     System.out.println("v=<videoId>");
     System.out.println("  Example: v=mNwgepMSn5E");
-    System.out.println("  Retrieve video info, by id. Video url is launched in browser.");
+    System.out.println("  Retrieve video info, by id. Video url is launched.");
     System.out.println();
-    System.out.println("n=<positionNumber>");
-    System.out.println("  Example: p=1");
-    System.out.println("  From last query that produced multiple results consume n-th position.");
-    System.out.println("  For a channel, uploads will be retrieved.");
-    System.out.println("  For a video, its url will be launched in browser.");
+    System.out.println("cn=<positionNumber>");
+    System.out.println("  Example: cn=1");
+    System.out.println("  Print n-th channel's uploads. Channel is taken from last search.");
+    System.out.println();
+    System.out.println("vn=<positionNumber>");
+    System.out.println("  Example: vn=1");
+    System.out.println("  Launch n-th video. Video is taken from last playlist or channel.");
     System.out.println();
     System.out.println("Empty query will exit the program loop.");
+  }
+
+  private static void printDefaultBrowserBehavior() {
+    System.out.println();
+
+    if (isBrowserSupported())
+      System.out.println("Launching over browser supported.");
+    else
+      System.out.println("Cannot launch over browser. Using clipboard instead.");
+  }
+
+  private static boolean isBrowserSupported() {
+    return Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.BROWSE);
   }
 
   private static String readInput() {
