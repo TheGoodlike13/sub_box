@@ -5,6 +5,7 @@ import eu.goodlike.sub.box.list.PlaylistFactory;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import static eu.goodlike.test.asserts.Asserts.assertNotBlank;
 import static eu.goodlike.test.asserts.Asserts.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -16,6 +17,7 @@ public class YoutubePlaylistFactoryTest {
   @Test
   public void nullInputs() {
     assertNotNull("youtube", YoutubePlaylistFactory::new);
+    assertNotBlank("playlistId", playlistFactory::newPlaylist);
   }
 
   @Test
