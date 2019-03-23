@@ -2,15 +2,15 @@ package eu.goodlike.sub.box.youtube;
 
 import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.common.base.MoreObjects;
-import eu.goodlike.sub.box.SubscriptionItem;
 import eu.goodlike.sub.box.util.require.Require;
+import eu.goodlike.sub.box.video.Video;
 import okhttp3.HttpUrl;
 
 import java.util.Objects;
 
 import static eu.goodlike.sub.box.util.require.Require.titled;
 
-public final class YoutubeVideo implements SubscriptionItem {
+public final class YoutubeVideo implements Video {
 
   @Override
   public String getId() {
@@ -53,6 +53,7 @@ public final class YoutubeVideo implements SubscriptionItem {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
+        .add("id", getId())
         .add("title", getTitle())
         .add("url", getUrl())
         .toString();
@@ -63,13 +64,14 @@ public final class YoutubeVideo implements SubscriptionItem {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     YoutubeVideo that = (YoutubeVideo)o;
-    return Objects.equals(getTitle(), that.getTitle()) &&
+    return Objects.equals(getId(), that.getId()) &&
+        Objects.equals(getTitle(), that.getTitle()) &&
         Objects.equals(getUrl(), that.getUrl());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getTitle(), getUrl());
+    return Objects.hash(getId(), getTitle(), getUrl());
   }
 
 }

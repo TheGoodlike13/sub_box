@@ -53,6 +53,7 @@ public final class YoutubeChannelSearchResult implements Search.Result {
   @Override
   public String toString() {
     return MoreObjects.toStringHelper(this)
+        .add("id", getId())
         .add("title", getTitle())
         .add("url", getUrl())
         .toString();
@@ -63,13 +64,14 @@ public final class YoutubeChannelSearchResult implements Search.Result {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
     YoutubeChannelSearchResult that = (YoutubeChannelSearchResult)o;
-    return Objects.equals(getTitle(), that.getTitle()) &&
+    return Objects.equals(getId(), that.getId()) &&
+        Objects.equals(getTitle(), that.getTitle()) &&
         Objects.equals(getUrl(), that.getUrl());
   }
 
   @Override
   public int hashCode() {
-    return Objects.hash(getTitle(), getUrl());
+    return Objects.hash(getId(), getTitle(), getUrl());
   }
 
 }
