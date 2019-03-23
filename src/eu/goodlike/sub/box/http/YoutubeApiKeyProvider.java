@@ -1,5 +1,6 @@
 package eu.goodlike.sub.box.http;
 
+import com.google.api.services.youtube.YouTubeRequestInitializer;
 import com.google.common.collect.ImmutableSet;
 import eu.goodlike.sub.box.util.require.Require;
 import okhttp3.HttpUrl;
@@ -12,7 +13,7 @@ import java.util.Set;
 
 import static eu.goodlike.sub.box.util.require.Require.titled;
 
-public final class YoutubeApiKeyProvider implements Interceptor {
+public final class YoutubeApiKeyProvider extends YouTubeRequestInitializer implements Interceptor {
 
   @Override
   public Response intercept(Chain chain) throws IOException {
@@ -20,10 +21,8 @@ public final class YoutubeApiKeyProvider implements Interceptor {
   }
 
   public YoutubeApiKeyProvider(String apiKey) {
-    this.apiKey = Require.notBlank(apiKey, titled("apiKey"));
+    super(Require.notBlank(apiKey, titled("apiKey")));
   }
-
-  private final String apiKey;
 
   private Request addApiKey(Request request) {
     return needsApiKey(request.url())
@@ -51,8 +50,12 @@ public final class YoutubeApiKeyProvider implements Interceptor {
 
   private HttpUrl setApiKeyParam(HttpUrl url) {
     return url.newBuilder()
-    .setQueryParameter(API_KEY_PARAM_NAME, apiKey)
+    .setQueryParameter(API_KEY_PARAM_NAME, getApiKey())
     .build();
+  }
+
+  private String getApiKey() {
+    return getKey();
   }
 
   private static final String API_HOST = "www.googleapis.com";
