@@ -6,7 +6,6 @@ import eu.goodlike.sub.box.channel.ChannelSearch;
 import eu.goodlike.test.mocks.http.MockHttpTransport;
 import org.junit.jupiter.api.Test;
 
-import java.io.IOException;
 import java.util.List;
 
 import static eu.goodlike.test.asserts.Asserts.*;
@@ -31,14 +30,14 @@ public class YoutubeChannelSearchTest {
   }
 
   @Test
-  public void noSearchResults() throws IOException {
+  public void noSearchResults() {
     List<Channel> searchResults = search.doSearch("definitely produces no results", 1);
 
     assertThat(searchResults).isNotNull().isEmpty();
   }
 
   @Test
-  public void performYoutubeSearch() throws IOException {
+  public void performYoutubeSearch() {
     List<Channel> searchResults = search.doSearch("let's code", 1);
 
     assertThat(searchResults).containsExactly(new YoutubeChannelViaSearch(youtube, getGoodlikeChannelResult()));

@@ -38,7 +38,7 @@ public final class Main implements AutoCloseable {
     System.out.println("Bye!");
   }
 
-  public void run() throws IOException {
+  public void run() {
     String input;
     while ((input = readInput()) != null)
       interpretInputAndPerformAppropriateTask(input);
@@ -73,7 +73,7 @@ public final class Main implements AutoCloseable {
 
   private List<Channel> channels;
 
-  private void interpretInputAndPerformAppropriateTask(String input) throws IOException {
+  private void interpretInputAndPerformAppropriateTask(String input) {
     if (input.startsWith("c="))
       performChannelSearch(input.substring(2));
     else if (input.startsWith("p="))
@@ -84,7 +84,7 @@ public final class Main implements AutoCloseable {
       System.out.println("Unknown query. Try again!");
   }
 
-  private void performChannelSearch(String channelSearchQuery) throws IOException {
+  private void performChannelSearch(String channelSearchQuery) {
     this.channels = channelSearch.doSearch(channelSearchQuery, maxResults);
     printChannels();
   }

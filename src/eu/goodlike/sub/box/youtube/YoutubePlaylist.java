@@ -1,6 +1,5 @@
 package eu.goodlike.sub.box.youtube;
 
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.PlaylistItemListResponse;
 import com.google.common.base.MoreObjects;
@@ -10,7 +9,6 @@ import eu.goodlike.sub.box.util.require.Require;
 import one.util.streamex.StreamEx;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.IOException;
 import java.util.Collection;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -41,32 +39,20 @@ public final class YoutubePlaylist implements Playlist {
   private final String playlistId;
 
   private Stream<PlaylistItemListResponse> getAllPlaylistPages() {
-    return StreamEx.iterate(getFirstPage(), response -> tryGetPlaylistPage(response.getNextPageToken()))
+    return StreamEx.iterate(getFirstPage(), response -> getPlaylistPage(response.getNextPageToken()))
         .takeWhileInclusive(response -> StringUtils.isNotBlank(response.getNextPageToken()));
   }
 
   private PlaylistItemListResponse getFirstPage() {
-    return tryGetPlaylistPage(null);
+    return getPlaylistPage(null);
   }
 
-  private PlaylistItemListResponse tryGetPlaylistPage(String pageToken) {
-    try {
-      return getPlaylistPage(pageToken);
-    } catch (GoogleJsonResponseException e) {
-      throw new YoutubeWarningException(e);
-    } catch (IOException e) {
-      throw new IllegalStateException("Unexpected error", e);
-    }
-  }
-
-  private PlaylistItemListResponse getPlaylistPage(String pageToken) throws IOException {
-    YouTube.PlaylistItems.List request = youtube.playlistItems().list("snippet");
-
-    request.setPageToken(pageToken);
-    request.setPlaylistId(playlistId);
-    request.setMaxResults(MAX_RESULTS_MAX_VALUE);
-
-    return request.execute();
+  private PlaylistItemListResponse getPlaylistPage(String pageToken) {
+    return YoutubeApiUtils.call(() -> youtube.playlistItems().list("snippet"), request -> {
+      request.setPageToken(pageToken);
+      request.setPlaylistId(playlistId);
+      request.setMaxResults(MAX_RESULTS_MAX_VALUE);
+    });
   }
 
   private static final Long MAX_RESULTS_MAX_VALUE = 50L;

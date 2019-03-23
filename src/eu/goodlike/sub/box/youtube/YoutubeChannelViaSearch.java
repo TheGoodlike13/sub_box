@@ -1,6 +1,5 @@
 package eu.goodlike.sub.box.youtube;
 
-import com.google.api.client.googleapis.json.GoogleJsonResponseException;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.ChannelListResponse;
 import com.google.common.base.MoreObjects;
@@ -10,7 +9,6 @@ import eu.goodlike.sub.box.search.Result;
 import eu.goodlike.sub.box.util.require.Require;
 import okhttp3.HttpUrl;
 
-import java.io.IOException;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -47,26 +45,14 @@ public final class YoutubeChannelViaSearch implements Channel {
   private final YoutubeChannelSearchResult result;
 
   private Playlist getUploadPlaylist() {
-    return new YoutubePlaylist(youtube, getUploadPlaylistId(tryFindChannelInfo()));
+    return new YoutubePlaylist(youtube, getUploadPlaylistId(findChannelInfo()));
   }
 
-  private ChannelListResponse tryFindChannelInfo() {
-    try {
-      return findChannelInfo();
-    } catch (GoogleJsonResponseException e) {
-      throw new YoutubeWarningException(e);
-    } catch (IOException e) {
-      throw new IllegalStateException("Unexpected error", e);
-    }
-  }
-
-  private ChannelListResponse findChannelInfo() throws IOException {
-    YouTube.Channels.List channelList = youtube.channels().list("contentDetails");
-
-    channelList.setId(getId());
-    channelList.setMaxResults(1L);
-
-    return channelList.execute();
+  private ChannelListResponse findChannelInfo() {
+    return YoutubeApiUtils.call(() -> youtube.channels().list("contentDetails"), request -> {
+      request.setId(getId());
+      request.setMaxResults(1L);
+    });
   }
 
   private String getUploadPlaylistId(ChannelListResponse response) {
