@@ -1,13 +1,9 @@
 package eu.goodlike.sub.box.list;
 
-import eu.goodlike.sub.box.search.Result;
+import eu.goodlike.sub.box.Subscribable;
 
-import java.util.stream.Stream;
-
-public interface Playlist {
+public interface Playlist extends Subscribable {
 
   String getId();
-
-  Stream<Result> getVideos();
 
 }

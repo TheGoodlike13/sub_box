@@ -3,8 +3,8 @@ package eu.goodlike.sub.box.youtube;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.PlaylistItemListResponse;
 import com.google.common.base.MoreObjects;
+import eu.goodlike.sub.box.SubscriptionItem;
 import eu.goodlike.sub.box.list.Playlist;
-import eu.goodlike.sub.box.search.Result;
 import eu.goodlike.sub.box.util.require.Require;
 import one.util.streamex.StreamEx;
 import org.apache.commons.lang3.StringUtils;
@@ -23,7 +23,7 @@ public final class YoutubePlaylist implements Playlist {
   }
 
   @Override
-  public Stream<Result> getVideos() {
+  public Stream<SubscriptionItem> getCurrentItems() {
     return getAllPlaylistPages()
         .map(PlaylistItemListResponse::getItems)
         .flatMap(Collection::stream)

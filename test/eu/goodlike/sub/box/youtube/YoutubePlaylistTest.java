@@ -35,14 +35,14 @@ public class YoutubePlaylistTest {
   public void emptyPlaylist() {
     Playlist empty = new YoutubePlaylist(youtube, "empty");
 
-    assertThat(empty.getVideos()).isEmpty();
+    assertThat(empty.getCurrentItems()).isEmpty();
   }
 
   @Test
   public void smallPlaylist() {
     Playlist small = new YoutubePlaylist(youtube, "small");
 
-    assertThat(small.getVideos()).containsExactly(getOsuVideo());
+    assertThat(small.getCurrentItems()).containsExactly(getOsuVideo());
   }
 
   @Test
@@ -50,7 +50,7 @@ public class YoutubePlaylistTest {
     Playlist massive = new YoutubePlaylist(youtube, "massive");
 
     YoutubeVideo fakeVideo = toYoutubeVideo("fakeId", "fakeTitle");
-    assertThat(massive.getVideos())
+    assertThat(massive.getCurrentItems())
         .haveExactly(50, new Condition<>(fakeVideo::equals, "fake video"))
         .containsOnlyOnce(getOsuVideo());
   }
@@ -60,7 +60,7 @@ public class YoutubePlaylistTest {
     Playlist deleted = new YoutubePlaylist(youtube, "deleted");
 
     assertThatExceptionOfType(YoutubeWarningException.class)
-        .isThrownBy(deleted::getVideos)
+        .isThrownBy(deleted::getCurrentItems)
         .withMessageContaining("The playlist identified with the requests playlistId parameter cannot be found.");
   }
 
@@ -69,7 +69,7 @@ public class YoutubePlaylistTest {
     Playlist privatePlaylist = new YoutubePlaylist(youtube, "private");
 
     assertThatExceptionOfType(YoutubeWarningException.class)
-        .isThrownBy(privatePlaylist::getVideos)
+        .isThrownBy(privatePlaylist::getCurrentItems)
         .withMessageContaining("The request is not properly authorized to retrieve the specified playlist.");
   }
 

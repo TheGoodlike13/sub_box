@@ -1,8 +1,8 @@
 package eu.goodlike.sub.box.channel;
 
-import eu.goodlike.sub.box.list.Playlist;
-import eu.goodlike.sub.box.search.Result;
+import eu.goodlike.sub.box.Subscribable;
+import eu.goodlike.sub.box.search.Search;
 
-public interface Channel extends Result, Playlist {
+public interface Channel extends Subscribable, Search.Result {
 
 }

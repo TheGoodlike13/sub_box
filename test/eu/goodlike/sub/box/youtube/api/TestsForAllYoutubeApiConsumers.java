@@ -43,11 +43,11 @@ public class TestsForAllYoutubeApiConsumers implements ArgumentsProvider {
   }
 
   private ThrowingConsumer<YouTube> playlistItems() {
-    return youtube -> new YoutubePlaylist(youtube, "any").getVideos().toArray();
+    return youtube -> new YoutubePlaylist(youtube, "any").getCurrentItems().toArray();
   }
 
   private ThrowingConsumer<YouTube> channelInfoAfterSearch() {
-    return youtube -> new YoutubeChannelViaSearch(youtube, getGoodlikeChannelResult()).getVideos();
+    return youtube -> new YoutubeChannelViaSearch(youtube, getGoodlikeChannelResult()).getCurrentItems();
   }
 
 }

@@ -8,9 +8,8 @@ import eu.goodlike.sub.box.channel.ChannelSearch;
 import eu.goodlike.sub.box.http.OkHttpTransport;
 import eu.goodlike.sub.box.http.RequestDebug;
 import eu.goodlike.sub.box.http.YoutubeApiKeyProvider;
-import eu.goodlike.sub.box.list.Playlist;
 import eu.goodlike.sub.box.list.PlaylistFactory;
-import eu.goodlike.sub.box.search.Result;
+import eu.goodlike.sub.box.search.Search;
 import eu.goodlike.sub.box.youtube.YoutubeChannelSearch;
 import eu.goodlike.sub.box.youtube.YoutubePlaylistFactory;
 import eu.goodlike.sub.box.youtube.YoutubeWarningException;
@@ -94,12 +93,12 @@ public final class Main implements AutoCloseable {
   }
 
   private void showVideosForPlaylist(String playlistId) {
-    List<Result> playlistVideos = getVideosForPlaylist(playlistId).collect(toImmutableList());
+    List<SubscriptionItem> playlistVideos = getVideosForPlaylist(playlistId).collect(toImmutableList());
     print(playlistVideos, "Playlist video");
   }
 
-  private Stream<Result> getVideosForPlaylist(String playlistId) {
-    return getVideos(playlistFactory.newPlaylist(playlistId), "playlist with id " + playlistId);
+  private Stream<SubscriptionItem> getVideosForPlaylist(String playlistId) {
+    return getItems(playlistFactory.newPlaylist(playlistId), "playlist with id " + playlistId);
   }
 
   private void showUploadsForPosition(String positionNumber) {
@@ -126,25 +125,25 @@ public final class Main implements AutoCloseable {
   }
 
   private void printUploads(Channel channel) {
-    List<Result> videos = getVideos(channel, "channel " + channel.getTitle()).collect(toImmutableList());
+    List<SubscriptionItem> videos = getItems(channel, "channel " + channel.getTitle()).collect(toImmutableList());
     print(videos, "Uploaded video");
   }
 
-  private Stream<Result> getVideos(Playlist playlist, String playlistDescription) {
+  private Stream<SubscriptionItem> getItems(Subscribable subscribable, String subscribableDescription) {
     try {
-      return playlist.getVideos();
+      return subscribable.getCurrentItems();
     }
     catch (YoutubeWarningException e) {
-      System.out.println("Cannot get videos for " + playlistDescription + ": " + e.getMessage());
+      System.out.println("Cannot get videos for " + subscribableDescription + ": " + e.getMessage());
       return Stream.empty();
     }
   }
 
-  private void print(List<? extends Result> printables, String printableDescription) {
+  private void print(List<? extends Search.Result> printables, String printableDescription) {
     int indexSize = String.valueOf(printables.size()).length();
 
     int position = 1;
-    for (Result printable : printables) {
+    for (Search.Result printable : printables) {
       String positionString = StringUtils.leftPad(String.valueOf(position++), indexSize);
       System.out.println(printableDescription + " " + positionString + ": " + printable.getTitle() + " @" + printable.getUrl());
     }

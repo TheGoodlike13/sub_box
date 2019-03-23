@@ -3,9 +3,9 @@ package eu.goodlike.sub.box.youtube;
 import com.google.api.services.youtube.YouTube;
 import com.google.api.services.youtube.model.ChannelListResponse;
 import com.google.common.base.MoreObjects;
+import eu.goodlike.sub.box.SubscriptionItem;
 import eu.goodlike.sub.box.channel.Channel;
 import eu.goodlike.sub.box.list.Playlist;
-import eu.goodlike.sub.box.search.Result;
 import eu.goodlike.sub.box.util.require.Require;
 import okhttp3.HttpUrl;
 
@@ -32,8 +32,8 @@ public final class YoutubeChannelViaSearch implements Channel {
   }
 
   @Override
-  public Stream<Result> getVideos() {
-    return getUploadPlaylist().getVideos();
+  public Stream<SubscriptionItem> getCurrentItems() {
+    return getUploadPlaylist().getCurrentItems();
   }
 
   public YoutubeChannelViaSearch(YouTube youtube, YoutubeChannelSearchResult result) {

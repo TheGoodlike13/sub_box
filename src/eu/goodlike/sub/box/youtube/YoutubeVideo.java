@@ -2,7 +2,7 @@ package eu.goodlike.sub.box.youtube;
 
 import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.common.base.MoreObjects;
-import eu.goodlike.sub.box.search.Result;
+import eu.goodlike.sub.box.SubscriptionItem;
 import eu.goodlike.sub.box.util.require.Require;
 import okhttp3.HttpUrl;
 
@@ -10,7 +10,7 @@ import java.util.Objects;
 
 import static eu.goodlike.sub.box.util.require.Require.titled;
 
-public final class YoutubeVideo implements Result {
+public final class YoutubeVideo implements SubscriptionItem {
 
   @Override
   public String getId() {

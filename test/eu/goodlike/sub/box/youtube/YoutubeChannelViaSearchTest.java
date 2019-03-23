@@ -34,7 +34,7 @@ public class YoutubeChannelViaSearchTest {
     YoutubeChannelSearchResult normalChannel = getGoodlikeChannelResult();
     YoutubeChannelViaSearch channel = new YoutubeChannelViaSearch(youtube, normalChannel);
 
-    assertThat(channel.getVideos()).containsExactly(getOsuVideo());
+    assertThat(channel.getCurrentItems()).containsExactly(getOsuVideo());
   }
 
   @Test
@@ -43,7 +43,7 @@ public class YoutubeChannelViaSearchTest {
     YoutubeChannelViaSearch channel = new YoutubeChannelViaSearch(youtube, deletedChannel);
 
     assertThatExceptionOfType(YoutubeWarningException.class)
-        .isThrownBy(channel::getVideos)
+        .isThrownBy(channel::getCurrentItems)
         .withMessageContaining("The channel is deleted or banned.");
   }
 
@@ -53,7 +53,7 @@ public class YoutubeChannelViaSearchTest {
     YoutubeChannelViaSearch channel = new YoutubeChannelViaSearch(youtube, deletedChannel);
 
     assertThatExceptionOfType(YoutubeWarningException.class)
-        .isThrownBy(channel::getVideos)
+        .isThrownBy(channel::getCurrentItems)
         .withMessageContaining("The playlist identified with the requests playlistId parameter cannot be found.");
   }
 
