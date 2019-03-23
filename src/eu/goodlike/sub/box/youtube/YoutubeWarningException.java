@@ -8,11 +8,11 @@ import static eu.goodlike.sub.box.util.require.Require.titled;
 
 public class YoutubeWarningException extends RuntimeException {
 
-  public YoutubeWarningException(String message) {
+  YoutubeWarningException(String message) {
     super(message);
   }
 
-  public YoutubeWarningException(GoogleJsonResponseException cause) {
+  YoutubeWarningException(GoogleJsonResponseException cause) {
     super(deriveMessage(cause), cause);
   }
 
