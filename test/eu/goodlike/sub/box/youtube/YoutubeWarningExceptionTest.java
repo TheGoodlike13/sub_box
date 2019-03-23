@@ -11,11 +11,12 @@ import java.io.IOException;
 import static eu.goodlike.test.asserts.Asserts.assertNotNull;
 import static org.assertj.core.api.Assertions.assertThat;
 
+@SuppressWarnings("Convert2MethodRef")
 public class YoutubeWarningExceptionTest {
 
   @Test
   public void nullCause() {
-    assertNotNull("cause", YoutubeWarningException::new);
+    assertNotNull("cause", (GoogleJsonResponseException e) -> new YoutubeWarningException(e));
   }
 
   @Test
