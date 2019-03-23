@@ -26,11 +26,9 @@ import static com.google.common.collect.ImmutableList.toImmutableList;
 public final class Main implements AutoCloseable {
 
   public static void main(String... args) throws IOException {
-    int maxResults = getMaxResultsParam(args);
-
     printIntroduction();
 
-    try (Main main = new Main(maxResults)) {
+    try (Main main = new Main()) {
       main.run();
     }
 
@@ -48,9 +46,7 @@ public final class Main implements AutoCloseable {
     transport.shutdown();
   }
 
-  public Main(int maxResults) {
-    this.maxResults = maxResults;
-
+  public Main() {
     OkHttpClient client = new OkHttpClient.Builder()
         .addInterceptor(new RequestDebug())
         .addInterceptor(new YoutubeApiKeyProvider(PUBLIC_API_KEY))
@@ -65,12 +61,15 @@ public final class Main implements AutoCloseable {
     this.playlistFactory = new YoutubePlaylistFactory(youtube);
   }
 
-  private final int maxResults;
   private final HttpTransport transport;
   private final ChannelSearch channelSearch;
   private final PlaylistFactory playlistFactory;
 
+  private int maxResults = DEFAULT_MAX_RESULTS;
+  private boolean useBrowser = true;
+
   private List<Channel> channels;
+  private List<SubscriptionItem> items;
 
   private void interpretInputAndPerformAppropriateTask(String input) {
     if (input.startsWith("c="))
@@ -93,8 +92,8 @@ public final class Main implements AutoCloseable {
   }
 
   private void showVideosForPlaylist(String playlistId) {
-    List<SubscriptionItem> playlistVideos = getVideosForPlaylist(playlistId).collect(toImmutableList());
-    print(playlistVideos, "Playlist video");
+    this.items = getVideosForPlaylist(playlistId).collect(toImmutableList());
+    print(items, "Playlist video");
   }
 
   private Stream<SubscriptionItem> getVideosForPlaylist(String playlistId) {
@@ -125,8 +124,8 @@ public final class Main implements AutoCloseable {
   }
 
   private void printUploads(Channel channel) {
-    List<SubscriptionItem> videos = getItems(channel, "channel " + channel.getTitle()).collect(toImmutableList());
-    print(videos, "Uploaded video");
+    this.items = getItems(channel, "channel " + channel.getTitle()).collect(toImmutableList());
+    print(items, "Uploaded video");
   }
 
   private Stream<SubscriptionItem> getItems(Subscribable subscribable, String subscribableDescription) {
@@ -149,32 +148,40 @@ public final class Main implements AutoCloseable {
     }
   }
 
-  private static final String DEFAULT_MAX_RESULTS = "13";
+  private static final int DEFAULT_MAX_RESULTS = 13;
   private static final String PUBLIC_API_KEY = "AIzaSyC7Z0dhCTFFR_0Gt4YpuFjIlmEPFuvqpg8";
 
   private static final Scanner INPUT_READER = new Scanner(System.in);
 
-  private static int getMaxResultsParam(String[] args) {
-    String maxResultsArg = args == null || args.length < 1
-        ? DEFAULT_MAX_RESULTS
-        : args[0];
-    return Integer.parseInt(maxResultsArg);
-  }
-
   private static void printIntroduction() {
     System.out.println("Supported queries:");
     System.out.println();
+    System.out.println("!max=<integer>");
+    System.out.println("  Example: !max=50");
+    System.out.println("  Sets max queries for follow-up searches. Value will be constrained: 1 <= max <= 50");
+    System.out.println();
+    System.out.println("!b");
+    System.out.println("  Flip browser behavior.");
+    System.out.println("  If no browser is available, this option does nothing.");
+    System.out.println("  If browser is available, switches to using clipboard instead, or back to browser.");
+    System.out.println();
     System.out.println("c=<channelSearchQuery>");
-    System.out.println("  Search for channel");
     System.out.println("  Example: q=TheGoodlike13");
+    System.out.println("  Search for channel, by any related query.");
     System.out.println();
     System.out.println("p=<playlistId>");
-    System.out.println("  Retrieve videos in playlist, by id");
     System.out.println("  Example: p=PLh0Ul3zO7LAhXL0wblm4z-uWU4RGxtElv");
+    System.out.println("  Retrieve videos in playlist, by id.");
+    System.out.println();
+    System.out.println("v=<videoId>");
+    System.out.println("  Example: v=mNwgepMSn5E");
+    System.out.println("  Retrieve video info, by id. Video url is launched in browser.");
     System.out.println();
     System.out.println("n=<positionNumber>");
-    System.out.println("  Retrieve uploads for channel from last search, by position");
     System.out.println("  Example: p=1");
+    System.out.println("  From last query that produced multiple results consume n-th position.");
+    System.out.println("  For a channel, uploads will be retrieved.");
+    System.out.println("  For a video, its url will be launched in browser.");
     System.out.println();
     System.out.println("Empty query will exit the program loop.");
   }
