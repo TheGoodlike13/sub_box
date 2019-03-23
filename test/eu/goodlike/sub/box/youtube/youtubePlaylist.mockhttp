@@ -1,8 +1,8 @@
 playlistItems
-  http/osuVideo.json
+  http/osuVideo_playlist.json
   playlistId=small
 
-  http/osuVideo.json
+  http/osuVideo_playlist.json
   playlistId=massive
   pageToken=CAEQAA
 

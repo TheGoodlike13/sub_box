@@ -1,9 +1,8 @@
 package eu.goodlike.test.mocks.youtube;
 
-import com.google.api.services.youtube.model.PlaylistItem;
-import com.google.api.services.youtube.model.PlaylistItemSnippet;
-import com.google.api.services.youtube.model.ResourceId;
-import eu.goodlike.sub.box.youtube.YoutubeVideo;
+import com.google.api.services.youtube.model.*;
+import eu.goodlike.sub.box.youtube.YoutubeVideoViaLookup;
+import eu.goodlike.sub.box.youtube.YoutubeVideoViaPlaylist;
 import okhttp3.HttpUrl;
 
 public final class VideoMocks {
@@ -12,7 +11,7 @@ public final class VideoMocks {
   public static final String OSU_VIDEO_TITLE = "How to cheat at Osu!";
   public static final HttpUrl OSU_VIDEO_URL = HttpUrl.parse("https://www.youtube.com/watch?v=" + OSU_VIDEO_ID);
 
-  public static YoutubeVideo toYoutubeVideo(String videoId, String videoTitle) {
+  public static YoutubeVideoViaPlaylist toPlaylistVideo(String videoId, String videoTitle) {
     ResourceId id = new ResourceId();
     id.setKind("youtube#video");
     id.setVideoId(videoId);
@@ -24,11 +23,26 @@ public final class VideoMocks {
     PlaylistItem playlistItem = new PlaylistItem();
     playlistItem.setSnippet(snippet);
 
-    return new YoutubeVideo(playlistItem);
+    return new YoutubeVideoViaPlaylist(playlistItem);
   }
 
-  public static YoutubeVideo getOsuVideo() {
-    return toYoutubeVideo(OSU_VIDEO_ID, OSU_VIDEO_TITLE);
+  public static YoutubeVideoViaLookup toVideoViaLookup(String videoId, String videoTitle) {
+    VideoSnippet snippet = new VideoSnippet();
+    snippet.setTitle(videoTitle);
+
+    Video video = new Video();
+    video.setId(videoId);
+    video.setSnippet(snippet);
+
+    return new YoutubeVideoViaLookup(video);
+  }
+
+  public static YoutubeVideoViaPlaylist getOsuPlaylistVideo() {
+    return toPlaylistVideo(OSU_VIDEO_ID, OSU_VIDEO_TITLE);
+  }
+
+  public static YoutubeVideoViaLookup getOsuVideoLookup() {
+    return toVideoViaLookup(OSU_VIDEO_ID, OSU_VIDEO_TITLE);
   }
 
   private VideoMocks() {

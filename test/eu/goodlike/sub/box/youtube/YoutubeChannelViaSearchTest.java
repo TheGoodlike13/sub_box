@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 
 import static eu.goodlike.test.asserts.Asserts.assertNotNull;
 import static eu.goodlike.test.mocks.youtube.ChannelMocks.*;
-import static eu.goodlike.test.mocks.youtube.VideoMocks.getOsuVideo;
+import static eu.goodlike.test.mocks.youtube.VideoMocks.getOsuPlaylistVideo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -34,7 +34,7 @@ public class YoutubeChannelViaSearchTest {
     YoutubeChannelSearchResult normalChannel = getGoodlikeChannelResult();
     YoutubeChannelViaSearch channel = new YoutubeChannelViaSearch(youtube, normalChannel);
 
-    assertThat(channel.getCurrentItems()).containsExactly(getOsuVideo());
+    assertThat(channel.getCurrentItems()).containsExactly(getOsuPlaylistVideo());
   }
 
   @Test

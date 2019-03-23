@@ -8,7 +8,7 @@ channels
   http/noResults.json
 
 playlistItems
-  http/osuVideo.json
+  http/osuVideo_playlist.json
   playlistId=UUlzfx-qU_5Xufh5BTmKnRdQ
 
   http/error/deletedPlaylist.json

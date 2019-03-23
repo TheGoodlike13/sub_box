@@ -3,14 +3,14 @@ package eu.goodlike.sub.box.youtube;
 import com.google.api.services.youtube.model.PlaylistItem;
 import com.google.common.base.MoreObjects;
 import eu.goodlike.sub.box.util.require.Require;
-import eu.goodlike.sub.box.video.Video;
+import eu.goodlike.sub.box.video.VideoItem;
 import okhttp3.HttpUrl;
 
 import java.util.Objects;
 
 import static eu.goodlike.sub.box.util.require.Require.titled;
 
-public final class YoutubeVideo implements Video {
+public final class YoutubeVideoViaPlaylist implements VideoItem {
 
   @Override
   public String getId() {
@@ -27,7 +27,7 @@ public final class YoutubeVideo implements Video {
     return HttpUrl.parse(VIDEO_URL_PREFIX + getVideoId());
   }
 
-  public YoutubeVideo(PlaylistItem playlistItem) {
+  public YoutubeVideoViaPlaylist(PlaylistItem playlistItem) {
     this.playlistItem = Require.notNull(playlistItem, titled("playlistItem"));
     assertItemPopulated();
   }
@@ -63,7 +63,7 @@ public final class YoutubeVideo implements Video {
   public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
-    YoutubeVideo that = (YoutubeVideo)o;
+    YoutubeVideoViaPlaylist that = (YoutubeVideoViaPlaylist)o;
     return Objects.equals(getId(), that.getId()) &&
         Objects.equals(getTitle(), that.getTitle()) &&
         Objects.equals(getUrl(), that.getUrl());

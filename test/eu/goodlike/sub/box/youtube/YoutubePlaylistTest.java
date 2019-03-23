@@ -8,8 +8,8 @@ import org.junit.jupiter.api.Test;
 
 import static eu.goodlike.test.asserts.Asserts.assertNotBlank;
 import static eu.goodlike.test.asserts.Asserts.assertNotNull;
-import static eu.goodlike.test.mocks.youtube.VideoMocks.getOsuVideo;
-import static eu.goodlike.test.mocks.youtube.VideoMocks.toYoutubeVideo;
+import static eu.goodlike.test.mocks.youtube.VideoMocks.getOsuPlaylistVideo;
+import static eu.goodlike.test.mocks.youtube.VideoMocks.toPlaylistVideo;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -42,17 +42,17 @@ public class YoutubePlaylistTest {
   public void smallPlaylist() {
     Playlist small = new YoutubePlaylist(youtube, "small");
 
-    assertThat(small.getCurrentItems()).containsExactly(getOsuVideo());
+    assertThat(small.getCurrentItems()).containsExactly(getOsuPlaylistVideo());
   }
 
   @Test
   public void massivePlaylist() {
     Playlist massive = new YoutubePlaylist(youtube, "massive");
 
-    YoutubeVideo fakeVideo = toYoutubeVideo("fakeId", "fakeTitle");
+    YoutubeVideoViaPlaylist fakeVideo = toPlaylistVideo("fakeId", "fakeTitle");
     assertThat(massive.getCurrentItems())
         .haveExactly(50, new Condition<>(fakeVideo::equals, "fake video"))
-        .containsOnlyOnce(getOsuVideo());
+        .containsOnlyOnce(getOsuPlaylistVideo());
   }
 
   @Test

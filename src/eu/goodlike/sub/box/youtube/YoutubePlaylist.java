@@ -27,7 +27,7 @@ public final class YoutubePlaylist implements Playlist {
     return getAllPlaylistPages()
         .map(PlaylistItemListResponse::getItems)
         .flatMap(Collection::stream)
-        .map(YoutubeVideo::new);
+        .map(YoutubeVideoViaPlaylist::new);
   }
 
   public YoutubePlaylist(YouTube youtube, String playlistId) {
