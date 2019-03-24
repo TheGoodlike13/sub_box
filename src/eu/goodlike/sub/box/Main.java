@@ -107,7 +107,7 @@ public final class Main implements AutoCloseable {
   }
 
   private void setMaxResults(String integer) {
-    this.maxResults = Math.max(0, Math.min(getIntOrZero(integer), 50));
+    this.maxResults = Math.max(1, Math.min(getIntOrZero(integer), 50));
     System.out.println("Max results for search set to " + maxResults);
   }
 
@@ -248,7 +248,7 @@ public final class Main implements AutoCloseable {
     System.out.println();
     System.out.println("!max=<integer>");
     System.out.println("  Example: !max=50");
-    System.out.println("  Sets max queries for follow-up searches. Value will be constrained: 1 <= max <= 50");
+    System.out.println("  Sets max results for follow-up searches. Value will be constrained: 1 <= max <= 50");
     System.out.println();
     System.out.println("!b");
     System.out.println("  Flip browser behavior.");

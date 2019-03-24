@@ -23,14 +23,14 @@ public final class YoutubeApiSpike {
         .setApplicationName("sub_box")
         .build();
 
-    getPlaylistVideos(youtube).forEach(System.out::println);
+    getVideo(youtube).forEach(System.out::println);
   }
 
   private static List<?> getVideo(YouTube youtube) throws IOException {
     YouTube.Videos.List playlist = youtube.videos().list("id,snippet");
 
     playlist.setMaxResults(1L);
-    playlist.setId("iVV6SmNyap4");
+    playlist.setId("PxWCEehAAZE");
 
     VideoListResponse response = playlist.execute();
     return response.getItems();

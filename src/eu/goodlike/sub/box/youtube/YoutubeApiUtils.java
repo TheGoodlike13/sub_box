@@ -21,7 +21,7 @@ final class YoutubeApiUtils {
   private static <T, R extends YouTubeRequest<T>> R newRequest(YoutubeApiRequestSupplier<T, R> requestSupplier) {
     try {
       return requestSupplier.createRequest();
-    } catch (Throwable e) {
+    } catch (IOException e) {
       throw new IllegalStateException("Cannot initiate YouTube requests. Some YouTube request initializer throw an exception.", e);
     }
   }
