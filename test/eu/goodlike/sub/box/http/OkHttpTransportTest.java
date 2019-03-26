@@ -4,8 +4,7 @@ import com.google.api.client.http.HttpMethods;
 import com.google.common.io.Files;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
-import okhttp3.internal.Internal;
-import okhttp3.internal.connection.RealConnection;
+import okhttp3.internal.connection.OkHttpInternalConnectionPackageUtils;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
@@ -64,7 +63,7 @@ public class OkHttpTransportTest {
   @Test
   public void shutdown() throws IOException {
     OkHttpClient client = new OkHttpClient();
-    initializeConnectionPoolUsingInternalAPI(client);
+    OkHttpInternalConnectionPackageUtils.addFakeConnectionUsingInternalApi(client);
 
     new OkHttpTransport(client).shutdown();
 
@@ -84,12 +83,6 @@ public class OkHttpTransportTest {
     new OkHttpTransport(client).shutdown();
 
     assertThat(client.cache().isClosed()).isTrue();
-  }
-
-  private void initializeConnectionPoolUsingInternalAPI(OkHttpClient client) {
-    synchronized (client.connectionPool()) {
-      Internal.instance.put(client.connectionPool(), new RealConnection(client.connectionPool(), null));
-    }
   }
 
 }
