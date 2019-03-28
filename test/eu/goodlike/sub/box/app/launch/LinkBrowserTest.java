@@ -55,10 +55,10 @@ public class LinkBrowserTest {
 
   @Test
   public void desktopCanSuccessfullyLaunchUrl() {
-    browserNotAvailable.launch(URL);
+    assertThat(browserNotAvailable.launch(URL)).isFalse();
     assertBrowserEvent(LinkLauncherListenerEventType.UNSUPPORTED, null);
 
-    browserMocked.launch(URL);
+    assertThat(browserMocked.launch(URL)).isTrue();
     assertBrowserEvent(LinkLauncherListenerEventType.SUCCESS, null);
   }
 
@@ -74,7 +74,7 @@ public class LinkBrowserTest {
   private void assertAssociated(LinkLauncherListenerEventType associatedEventType, Class<? extends Throwable> exceptionClass) throws IOException {
     Mockito.doThrow(exceptionClass).when(desktop).browse(any(URI.class));
 
-    browserMocked.launch(URL);
+    assertThat(browserMocked.launch(URL)).isFalse();
 
     assertBrowserEvent(associatedEventType, exceptionClass);
   }

@@ -18,13 +18,12 @@ public final class LinkPaste extends LinkLauncherListenable {
   }
 
   @Override
-  public void launch(HttpUrl url) {
+  public boolean launch(HttpUrl url) {
     Require.notNull(url, titled("url"));
 
-    if (isAvailable())
-      copyToClipboard(url);
-    else
-      onUnsupported(CLIPBOARD, url);
+    return isAvailable()
+        ? tryCopyToClipboard(url)
+        : reportIsUnsupported(url);
   }
 
   public LinkPaste() {
@@ -37,16 +36,23 @@ public final class LinkPaste extends LinkLauncherListenable {
 
   private final Clipboard clipboard;
 
-  private void copyToClipboard(HttpUrl url) {
+  private boolean tryCopyToClipboard(HttpUrl url) {
     StringSelection clipboardData = new StringSelection(url.toString());
     try {
       clipboard.setContents(clipboardData, clipboardData);
       onSuccess(CLIPBOARD, url);
+      return true;
     } catch (IllegalStateException e) {
       onSuddenlyUnsupported(CLIPBOARD, url, e);
     } catch (Exception e) {
       onOtherError(CLIPBOARD, url, e);
     }
+    return false;
+  }
+
+  private boolean reportIsUnsupported(HttpUrl url) {
+    onUnsupported(CLIPBOARD, url);
+    return false;
   }
 
   private static final Clipboard SYSTEM_CLIPBOARD = tryGetClipboard();

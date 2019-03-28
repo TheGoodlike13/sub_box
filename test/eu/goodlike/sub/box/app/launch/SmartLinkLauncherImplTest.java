@@ -14,6 +14,7 @@ import java.util.List;
 import static eu.goodlike.sub.box.app.launch.LinkLauncherType.OTHER;
 import static eu.goodlike.test.mocks.app.LinkLauncherListenerEventType.UNSUPPORTED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.never;
 
 public class SmartLinkLauncherImplTest {
 
@@ -34,6 +35,10 @@ public class SmartLinkLauncherImplTest {
     Mockito.when(launcher1.isAvailable()).thenReturn(true);
     Mockito.when(launcher2.isAvailable()).thenReturn(true);
     Mockito.when(launcher3.isAvailable()).thenReturn(true);
+
+    Mockito.when(launcher1.launch(URL)).thenReturn(true);
+    Mockito.when(launcher2.launch(URL)).thenReturn(true);
+    Mockito.when(launcher3.launch(URL)).thenReturn(true);
 
     launcher = new SmartLinkLauncherImpl(launcher1, launcher2, launcher3);
     launcher.addListener(listener);
@@ -67,25 +72,29 @@ public class SmartLinkLauncherImplTest {
       assertThat(launcher.isAvailable()).isFalse();
 
       launcher.addListener(listener);
-      launcher.launch(URL);
+      assertThat(launcher.launch(URL)).isFalse();
       listener.assertEventMatches(UNSUPPORTED, OTHER, URL, AbstractAssert::isNull);
     }
   }
 
   @Test
   public void availableLaunchersDefault() {
-    launcher.launch(URL);
+    assertThat(launcher.launch(URL)).isTrue();
 
     Mockito.verify(launcher1).launch(URL);
+    Mockito.verify(launcher2, never()).launch(URL);
+    Mockito.verify(launcher3, never()).launch(URL);
   }
 
   @Test
   public void availableLaunchersAdjustOnce() {
     launcher.nextDefaultLauncher();
 
-    launcher.launch(URL);
+    assertThat(launcher.launch(URL)).isTrue();
 
+    Mockito.verify(launcher1, never()).launch(URL);
     Mockito.verify(launcher2).launch(URL);
+    Mockito.verify(launcher3, never()).launch(URL);
   }
 
   @Test
@@ -93,8 +102,10 @@ public class SmartLinkLauncherImplTest {
     launcher.nextDefaultLauncher();
     launcher.nextDefaultLauncher();
 
-    launcher.launch(URL);
+    assertThat(launcher.launch(URL)).isTrue();
 
+    Mockito.verify(launcher1, never()).launch(URL);
+    Mockito.verify(launcher2, never()).launch(URL);
     Mockito.verify(launcher3).launch(URL);
   }
 
@@ -104,9 +115,47 @@ public class SmartLinkLauncherImplTest {
     launcher.nextDefaultLauncher();
     launcher.nextDefaultLauncher();
 
-    launcher.launch(URL);
+    assertThat(launcher.launch(URL)).isTrue();
 
     Mockito.verify(launcher1).launch(URL);
+    Mockito.verify(launcher2, never()).launch(URL);
+    Mockito.verify(launcher3, never()).launch(URL);
+  }
+
+  @Test
+  public void launcherFail_1() {
+    Mockito.when(launcher1.launch(URL)).thenReturn(false);
+
+    assertThat(launcher.launch(URL)).isTrue();
+
+    Mockito.verify(launcher1).launch(URL);
+    Mockito.verify(launcher2).launch(URL);
+    Mockito.verify(launcher3, never()).launch(URL);
+  }
+
+  @Test
+  public void launcherFail_1_2() {
+    Mockito.when(launcher1.launch(URL)).thenReturn(false);
+    Mockito.when(launcher2.launch(URL)).thenReturn(false);
+
+    assertThat(launcher.launch(URL)).isTrue();
+
+    Mockito.verify(launcher1).launch(URL);
+    Mockito.verify(launcher2).launch(URL);
+    Mockito.verify(launcher3).launch(URL);
+  }
+
+  @Test
+  public void launcherFail_1_2_3() {
+    Mockito.when(launcher1.launch(URL)).thenReturn(false);
+    Mockito.when(launcher2.launch(URL)).thenReturn(false);
+    Mockito.when(launcher3.launch(URL)).thenReturn(false);
+
+    assertThat(launcher.launch(URL)).isFalse();
+
+    Mockito.verify(launcher1).launch(URL);
+    Mockito.verify(launcher2).launch(URL);
+    Mockito.verify(launcher3).launch(URL);
   }
 
 }

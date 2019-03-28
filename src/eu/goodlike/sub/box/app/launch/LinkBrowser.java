@@ -18,13 +18,12 @@ public final class LinkBrowser extends LinkLauncherListenable {
   }
 
   @Override
-  public void launch(HttpUrl url) {
+  public boolean launch(HttpUrl url) {
     Require.notNull(url, titled("url"));
 
-    if (isAvailable())
-      browse(url);
-    else
-      onUnsupported(BROWSER, url);
+    return isAvailable()
+        ? tryBrowse(url)
+        : reportIsUnsupported(url);
   }
 
   public LinkBrowser() {
@@ -37,11 +36,12 @@ public final class LinkBrowser extends LinkLauncherListenable {
 
   private final Desktop desktop;
 
-  private void browse(HttpUrl url) {
+  private boolean tryBrowse(HttpUrl url) {
     URI uri = url.uri();
     try {
       desktop.browse(uri);
       onSuccess(BROWSER, url);
+      return true;
     } catch (UnsupportedOperationException | IOException e) {
       onSuddenlyUnsupported(BROWSER, url, e);
     } catch (SecurityException e) {
@@ -51,6 +51,12 @@ public final class LinkBrowser extends LinkLauncherListenable {
     } catch (Exception e) {
       onOtherError(BROWSER, url, e);
     }
+    return false;
+  }
+
+  private boolean reportIsUnsupported(HttpUrl url) {
+    onUnsupported(BROWSER, url);
+    return false;
   }
 
   private static final Desktop DESKTOP_WITH_BROWSER_SUPPORT = tryGetDesktopWithBrowserSupport();

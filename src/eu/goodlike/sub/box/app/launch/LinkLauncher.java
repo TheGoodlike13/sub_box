@@ -6,7 +6,7 @@ public interface LinkLauncher {
 
   boolean isAvailable();
 
-  void launch(HttpUrl url);
+  boolean launch(HttpUrl url);
 
   void addListener(LinkLauncherListener listener);
 

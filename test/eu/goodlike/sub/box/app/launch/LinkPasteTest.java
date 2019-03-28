@@ -56,10 +56,10 @@ public class LinkPasteTest {
 
   @Test
   public void desktopCanSuccessfullyLaunchUrl() {
-    clipboardNotAvailable.launch(URL);
+    assertThat(clipboardNotAvailable.launch(URL)).isFalse();
     assertClipboardEvent(UNSUPPORTED, null);
 
-    clipboardMocked.launch(URL);
+    assertThat(clipboardMocked.launch(URL)).isTrue();
     assertClipboardEvent(SUCCESS, null);
   }
 
@@ -72,7 +72,7 @@ public class LinkPasteTest {
   private void assertAssociated(LinkLauncherListenerEventType associatedEventType, Class<? extends Throwable> exceptionClass) {
     Mockito.doThrow(exceptionClass).when(clipboard).setContents(any(Transferable.class), any(ClipboardOwner.class));
 
-    clipboardMocked.launch(URL);
+    assertThat(clipboardMocked.launch(URL)).isFalse();
 
     assertClipboardEvent(associatedEventType, exceptionClass);
   }
