@@ -5,7 +5,10 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
 import eu.goodlike.sub.box.Subscribable;
 import eu.goodlike.sub.box.SubscriptionItem;
-import eu.goodlike.sub.box.app.launch.*;
+import eu.goodlike.sub.box.app.launch.LinkBrowser;
+import eu.goodlike.sub.box.app.launch.LinkPaste;
+import eu.goodlike.sub.box.app.launch.SmartLinkLauncher;
+import eu.goodlike.sub.box.app.launch.SmartLinkLauncherImpl;
 import eu.goodlike.sub.box.channel.Channel;
 import eu.goodlike.sub.box.channel.ChannelSearch;
 import eu.goodlike.sub.box.http.OkHttpTransport;
@@ -19,7 +22,6 @@ import eu.goodlike.sub.box.youtube.YoutubeChannelSearch;
 import eu.goodlike.sub.box.youtube.YoutubePlaylistFactory;
 import eu.goodlike.sub.box.youtube.YoutubeVideoFinder;
 import eu.goodlike.sub.box.youtube.YoutubeWarningException;
-import okhttp3.HttpUrl;
 import okhttp3.OkHttpClient;
 import org.apache.commons.lang3.StringUtils;
 
@@ -32,7 +34,7 @@ import java.util.stream.Stream;
 
 import static com.google.common.collect.ImmutableList.toImmutableList;
 
-public final class Main implements AutoCloseable, Runnable, LinkLauncherListener {
+public final class Main implements AutoCloseable, Runnable {
 
   public static void main(String... args) throws IOException {
     printIntroduction();
@@ -51,36 +53,6 @@ public final class Main implements AutoCloseable, Runnable, LinkLauncherListener
     String input;
     while ((input = readInput()) != null)
       interpretInputAndPerformAppropriateTask(input);
-  }
-
-  @Override
-  public void onSuccess(LinkLauncherType type, HttpUrl url) {
-    System.out.println(getSuccessMessage(type, url));
-  }
-
-  @Override
-  public void onUnsupported(LinkLauncherType type, HttpUrl url) {
-    System.out.println(getUnsupportedMessage(type, url));
-  }
-
-  @Override
-  public void onSuddenlyUnsupported(LinkLauncherType type, HttpUrl url, Exception e) {
-    System.out.println(getErrorMessage(type, url, e));
-  }
-
-  @Override
-  public void onMissingPermission(LinkLauncherType type, HttpUrl url, Exception e) {
-    System.out.println(getErrorMessage(type, url, e));
-  }
-
-  @Override
-  public void onIssueWithUrl(LinkLauncherType type, HttpUrl url, Exception e) {
-    System.out.println(getErrorMessage(type, url, e));
-  }
-
-  @Override
-  public void onOtherError(LinkLauncherType type, HttpUrl url, Exception e) {
-    System.out.println(getErrorMessage(type, url, e));
   }
 
   @Override
@@ -104,7 +76,7 @@ public final class Main implements AutoCloseable, Runnable, LinkLauncherListener
     this.videoFinder = new YoutubeVideoFinder(youtube);
 
     this.linkLauncher = new SmartLinkLauncherImpl(new LinkBrowser(), new LinkPaste());
-    this.linkLauncher.addListener(this);
+    this.linkLauncher.addListener(new MainLauncherListener());
   }
 
   private final HttpTransport transport;
@@ -207,33 +179,6 @@ public final class Main implements AutoCloseable, Runnable, LinkLauncherListener
     print(item, "Selected video");
 
     linkLauncher.launch(item.getUrl());
-  }
-
-  private String getSuccessMessage(LinkLauncherType type, HttpUrl url) {
-    switch (type) {
-      case BROWSER: return "Video URL launched in browser.";
-      case CLIPBOARD: return "Video URL copied to clipboard.";
-      case OTHER: return "Video URL launched via other means.";
-    }
-    throw new IllegalStateException("Unsupported link type: " + type);
-  }
-
-  private String getUnsupportedMessage(LinkLauncherType type, HttpUrl url) {
-    switch (type) {
-      case BROWSER: return "Launching URL via browser is not supported.";
-      case CLIPBOARD: return "Copying URL to clipboard is not supported.";
-      case OTHER: return "Could not launch video URL via any means.";
-    }
-    throw new IllegalStateException("Unsupported link type: " + type);
-  }
-
-  private String getErrorMessage(LinkLauncherType type, HttpUrl url, Exception e) {
-    switch (type) {
-      case BROWSER: return "Could not launch video URL in browser: " + e;
-      case CLIPBOARD: return "Could not copy video URL to clipboard: " + e;
-      case OTHER: return "Could not copy video URL via other means: " + e;
-    }
-    throw new IllegalStateException("Unsupported link type: " + type);
   }
 
   private Integer getPosition(String positionNumber, int max) {
