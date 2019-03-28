@@ -13,7 +13,7 @@ import java.io.IOException;
 
 import static eu.goodlike.test.asserts.Asserts.assertNotNull;
 import static eu.goodlike.test.mocks.OkHttpMocks.basicRequest;
-import static eu.goodlike.test.mocks.OkHttpMocks.basicUrl;
+import static eu.goodlike.test.mocks.OkHttpMocks.basicUrlString;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 
@@ -48,12 +48,12 @@ public class OkHttpTransportTest {
   @Test
   public void buildRequestForUnsupportedMethod() {
     assertThatExceptionOfType(IllegalArgumentException.class)
-        .isThrownBy(() -> transport.buildRequest(null, basicUrl()));
+        .isThrownBy(() -> transport.buildRequest(null, basicUrlString()));
   }
 
   @Test
   public void buildRequest() {
-    OkHttpRequest request = transport.buildRequest("get", basicUrl());
+    OkHttpRequest request = transport.buildRequest("get", basicUrlString());
 
     assertThat(request.client).isEqualTo(clientMock);
     assertThat(request.method).isEqualTo("GET");

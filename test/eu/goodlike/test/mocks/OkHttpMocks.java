@@ -13,15 +13,19 @@ public final class OkHttpMocks {
   }
 
   public static Request.Builder basicRequest() {
-    return new Request.Builder().url(basicUrl());
+    return new Request.Builder().url(basicUrlString());
   }
 
   public static ResponseBody toBody(String text) {
     return ResponseBody.create(MediaType.get("text/plain"), text);
   }
 
-  public static String basicUrl() {
+  public static String basicUrlString() {
     return "https://www.google.com/";
+  }
+
+  public static HttpUrl basicUrl() {
+    return HttpUrl.get(basicUrlString());
   }
 
   private OkHttpMocks() {
