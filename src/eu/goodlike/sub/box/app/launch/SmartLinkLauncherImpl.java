@@ -15,7 +15,7 @@ public final class SmartLinkLauncherImpl extends LinkLauncherListenable implemen
 
   @Override
   public int nextDefaultLauncher() {
-    return launcherIndex.updateAndGet(index -> (index + 1) % launchers.size());
+    return launcherIndex.updateAndGet(index -> (index + 1) % launcherIndexLimit());
   }
 
   @Override
@@ -39,12 +39,13 @@ public final class SmartLinkLauncherImpl extends LinkLauncherListenable implemen
   private List<LinkLauncher> toLauncherList(LinkLauncher defaultLauncher, LinkLauncher[] fallbackLaunchers) {
     List<LinkLauncher> launchers = new ArrayList<>();
 
-    if (defaultLauncher != null)
+    if (defaultLauncher != null && defaultLauncher.isAvailable())
       launchers.add(defaultLauncher);
 
     if (fallbackLaunchers != null)
       Stream.of(fallbackLaunchers)
           .filter(Objects::nonNull)
+          .filter(LinkLauncher::isAvailable)
           .forEach(launchers::add);
 
     return launchers.stream()
@@ -52,9 +53,12 @@ public final class SmartLinkLauncherImpl extends LinkLauncherListenable implemen
         .collect(toImmutableList());
   }
 
+  private int launcherIndexLimit() {
+    return Math.max(1, launchers.size());
+  }
+
   private boolean tryLaunchOnRemainingLaunchers(HttpUrl url) {
     return launchers.stream()
-        .filter(LinkLauncher::isAvailable)
         .skip(launcherIndex.get())
         .anyMatch(launcher -> launcher.launch(url));
   }

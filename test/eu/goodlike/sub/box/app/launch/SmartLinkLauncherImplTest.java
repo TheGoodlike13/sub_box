@@ -14,6 +14,7 @@ import java.util.List;
 import static eu.goodlike.sub.box.app.launch.LinkLauncherType.OTHER;
 import static eu.goodlike.test.mocks.app.LinkLauncherListenerEventType.UNSUPPORTED;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.mockito.Mockito.never;
 
 public class SmartLinkLauncherImplTest {
@@ -156,6 +157,13 @@ public class SmartLinkLauncherImplTest {
     Mockito.verify(launcher1).launch(URL);
     Mockito.verify(launcher2).launch(URL);
     Mockito.verify(launcher3).launch(URL);
+  }
+
+  @Test
+  public void doNotFailWhenAdjustingLauncherWithNoLaunchers() {
+    SmartLinkLauncher launcher = new SmartLinkLauncherImpl(null);
+
+    assertDoesNotThrow(launcher::nextDefaultLauncher);
   }
 
 }
