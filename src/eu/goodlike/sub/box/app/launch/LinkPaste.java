@@ -12,6 +12,10 @@ import static eu.goodlike.sub.box.util.require.Require.titled;
 
 public final class LinkPaste extends LinkLauncherListenable {
 
+  public static boolean isClipboardAvailable() {
+    return SYSTEM_CLIPBOARD != null;
+  }
+
   @Override
   public boolean isAvailable() {
     return clipboard != null;

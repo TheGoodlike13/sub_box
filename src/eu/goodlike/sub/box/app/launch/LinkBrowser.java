@@ -12,6 +12,10 @@ import static eu.goodlike.sub.box.util.require.Require.titled;
 
 public final class LinkBrowser extends LinkLauncherListenable {
 
+  public static boolean isBrowserAvailable() {
+    return DESKTOP_WITH_BROWSER_SUPPORT != null;
+  }
+
   @Override
   public boolean isAvailable() {
     return desktop != null;
