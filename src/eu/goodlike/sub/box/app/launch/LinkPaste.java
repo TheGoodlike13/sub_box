@@ -1,11 +1,13 @@
 package eu.goodlike.sub.box.app.launch;
 
+import com.google.common.base.Suppliers;
 import eu.goodlike.sub.box.util.require.Require;
 import okhttp3.HttpUrl;
 
 import java.awt.*;
 import java.awt.datatransfer.Clipboard;
 import java.awt.datatransfer.StringSelection;
+import java.util.function.Supplier;
 
 import static eu.goodlike.sub.box.app.launch.LinkLauncherType.CLIPBOARD;
 import static eu.goodlike.sub.box.util.require.Require.titled;
@@ -13,7 +15,7 @@ import static eu.goodlike.sub.box.util.require.Require.titled;
 public final class LinkPaste extends LinkLauncherListenable {
 
   public static boolean isClipboardAvailable() {
-    return SYSTEM_CLIPBOARD != null;
+    return SYSTEM_CLIPBOARD.get() != null;
   }
 
   @Override
@@ -31,7 +33,7 @@ public final class LinkPaste extends LinkLauncherListenable {
   }
 
   public LinkPaste() {
-    this(SYSTEM_CLIPBOARD);
+    this(SYSTEM_CLIPBOARD.get());
   }
 
   LinkPaste(Clipboard clipboard) {
@@ -59,7 +61,7 @@ public final class LinkPaste extends LinkLauncherListenable {
     return false;
   }
 
-  private static final Clipboard SYSTEM_CLIPBOARD = tryGetClipboard();
+  private static final Supplier<Clipboard> SYSTEM_CLIPBOARD = Suppliers.memoize(LinkPaste::tryGetClipboard);
 
   private static Clipboard tryGetClipboard() {
     if (!GraphicsEnvironment.isHeadless()) {

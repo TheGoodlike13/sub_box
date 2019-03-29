@@ -1,11 +1,13 @@
 package eu.goodlike.sub.box.app.launch;
 
+import com.google.common.base.Suppliers;
 import eu.goodlike.sub.box.util.require.Require;
 import okhttp3.HttpUrl;
 
 import java.awt.*;
 import java.io.IOException;
 import java.net.URI;
+import java.util.function.Supplier;
 
 import static eu.goodlike.sub.box.app.launch.LinkLauncherType.BROWSER;
 import static eu.goodlike.sub.box.util.require.Require.titled;
@@ -13,7 +15,7 @@ import static eu.goodlike.sub.box.util.require.Require.titled;
 public final class LinkBrowser extends LinkLauncherListenable {
 
   public static boolean isBrowserAvailable() {
-    return DESKTOP_WITH_BROWSER_SUPPORT != null;
+    return DESKTOP_WITH_BROWSER_SUPPORT.get() != null;
   }
 
   @Override
@@ -31,7 +33,7 @@ public final class LinkBrowser extends LinkLauncherListenable {
   }
 
   public LinkBrowser() {
-    this(DESKTOP_WITH_BROWSER_SUPPORT);
+    this(DESKTOP_WITH_BROWSER_SUPPORT.get());
   }
 
   LinkBrowser(Desktop desktop) {
@@ -63,7 +65,7 @@ public final class LinkBrowser extends LinkLauncherListenable {
     return false;
   }
 
-  private static final Desktop DESKTOP_WITH_BROWSER_SUPPORT = tryGetDesktopWithBrowserSupport();
+  private static final Supplier<Desktop> DESKTOP_WITH_BROWSER_SUPPORT = Suppliers.memoize(LinkBrowser::tryGetDesktopWithBrowserSupport);
 
   private static Desktop tryGetDesktopWithBrowserSupport() {
     if (GraphicsEnvironment.isHeadless() || !Desktop.isDesktopSupported())
