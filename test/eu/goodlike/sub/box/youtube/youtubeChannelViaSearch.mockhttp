@@ -1,18 +1,18 @@
 channels
-  http/thegoodlike13_lookup.json
+  data/thegoodlike13_lookup.json
   id=UC0dEueRlBJhHKfvWvJfjwxw
 
-  http/channel_about_to_be_deleted.json
+  data/channel_about_to_be_deleted.json
   id=almostDeleted
 
-  http/noResults.json
+  data/noResults.json
 
 playlistItems
-  http/osuVideo_playlist.json
+  data/osuVideo_playlist.json
   playlistId=UUlzfx-qU_5Xufh5BTmKnRdQ
 
-  http/error/deletedPlaylist.json
+  error/deletedPlaylist.json
   playlistId=deletedPlaylist
   404 Not Found
 
-  http/noResults.json
+  data/noResults.json

@@ -1,20 +1,20 @@
 playlistItems
-  http/osuVideo_playlist.json
+  data/osuVideo_playlist.json
   playlistId=small
 
-  http/osuVideo_playlist.json
+  data/osuVideo_playlist.json
   playlistId=massive
   pageToken=CAEQAA
 
-  http/playlistPage1.json
+  data/playlistPage1.json
   playlistId=massive
 
-  http/error/deletedPlaylist.json
+  error/deletedPlaylist.json
   playlistId=deleted
   404 Not Found
 
-  http/error/privatePlaylist.json
+  error/privatePlaylist.json
   playlistId=private
   403 Forbidden
 
-  http/noResults.json
+  data/noResults.json
