@@ -25,4 +25,6 @@ public interface ApplicationUi {
 
   void printItem(String itemDescription, Search.Result item);
 
+  void signalNoResultFromChannelSearch();
+
 }

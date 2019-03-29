@@ -56,4 +56,9 @@ public final class CmdUi implements ApplicationUi {
     System.out.println(itemDescription + ": " + item.getTitle() + " @" + item.getUrl());
   }
 
+  @Override
+  public void signalNoResultFromChannelSearch() {
+    System.out.println("Search did not return any channels. Try again!");
+  }
+
 }

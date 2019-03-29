@@ -1,0 +1,55 @@
+search
+  acceptance/thegoodlike13_search_1.json
+  q=thegoodlike13
+  maxResults=1
+
+  acceptance/thegoodlike13_search_13.json
+  q=thegoodlike13
+  maxResults=13
+
+  acceptance/deleteAfterSearch_search_1.json
+  q=deleteAfterSearch
+  maxResults=1
+
+  acceptance/deleteAfterPlaylistLookup_search_1.json
+  q=deleteAfterPlaylistLookup
+  maxResults=1
+
+  data/noResults.json
+
+playlistItems
+  data/osuVideo_playlist.json
+  playlistId=PLh0Ul3zO7LAhXL0wblm4z-uWU4RGxtElv
+  pageToken=CAEQAB
+
+  acceptance/playlistPage2.json
+  playlistId=PLh0Ul3zO7LAhXL0wblm4z-uWU4RGxtElv
+  pageToken=CAEQAA
+
+  acceptance/playlistPage1.json
+  playlistId=PLh0Ul3zO7LAhXL0wblm4z-uWU4RGxtElv
+
+  data/osuVideo_playlist.json
+  playlistId=UUlzfx-qU_5Xufh5BTmKnRdQ
+
+  error/privatePlaylist.json
+  playlistId=private
+  403 Forbidden
+
+  error/deletedPlaylist.json
+  404 Not Found
+
+video
+  data/osuVideo_lookup.json
+  id=mNwgepMSn5E
+
+  data/noResults.json
+
+channels
+  data/thegoodlike13_lookup.json
+  id=UC0dEueRlBJhHKfvWvJfjwxw
+
+  data/channel_about_to_be_deleted.json
+  id=almostDeleted
+
+  data/noResults.json

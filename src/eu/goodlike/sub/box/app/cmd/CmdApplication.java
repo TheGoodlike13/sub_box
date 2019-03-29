@@ -3,6 +3,7 @@ package eu.goodlike.sub.box.app.cmd;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.services.youtube.YouTube;
+import com.google.common.annotations.VisibleForTesting;
 import eu.goodlike.sub.box.Subscribable;
 import eu.goodlike.sub.box.SubscriptionItem;
 import eu.goodlike.sub.box.app.ApplicationProfile;
@@ -54,12 +55,16 @@ public final class CmdApplication implements AutoCloseable {
     transport.shutdown();
   }
 
+  @VisibleForTesting
+  YouTube getYoutube() {
+    return youtube;
+  }
+
   public CmdApplication(ApplicationProfile profile) {
     this.ui = profile.getUi();
 
     this.transport = profile.getHttpTransport();
-
-    YouTube youtube = new YouTube.Builder(transport, new JacksonFactory(), null)
+    this.youtube = new YouTube.Builder(transport, new JacksonFactory(), null)
         .setApplicationName(profile.getApplicationName())
         .build();
 
@@ -74,6 +79,7 @@ public final class CmdApplication implements AutoCloseable {
   private final ApplicationUi ui;
 
   private final HttpTransport transport;
+  private final YouTube youtube;
 
   private final ChannelSearch channelSearch;
   private final PlaylistFactory playlistFactory;
@@ -102,7 +108,10 @@ public final class CmdApplication implements AutoCloseable {
   }
 
   private void printChannels() {
-    print(channels, "Found channel");
+    if (channels.isEmpty())
+      ui.signalNoResultFromChannelSearch();
+    else
+      print(channels, "Found channel");
   }
 
   private void showVideosForPlaylist(String playlistId) {
