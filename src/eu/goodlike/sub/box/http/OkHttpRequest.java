@@ -1,6 +1,7 @@
 package eu.goodlike.sub.box.http;
 
 import com.google.api.client.http.LowLevelHttpRequest;
+import com.google.common.annotations.VisibleForTesting;
 import eu.goodlike.sub.box.util.require.Require;
 import okhttp3.*;
 import okio.BufferedSink;
@@ -45,10 +46,13 @@ final class OkHttpRequest extends LowLevelHttpRequest {
     this.method = Require.notBlank(method, titled("method")).toUpperCase();
   }
 
-  // fields are package private to allow tests to assert on the objects (otherwise impossible without reflection)
+  @VisibleForTesting
   OkHttpClient client;
 
+  @VisibleForTesting
   final Request.Builder request;
+
+  @VisibleForTesting
   final String method;
 
   private Request createRequest() {

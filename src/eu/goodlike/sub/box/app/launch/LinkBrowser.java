@@ -1,5 +1,6 @@
 package eu.goodlike.sub.box.app.launch;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Suppliers;
 import eu.goodlike.sub.box.util.require.Require;
 import okhttp3.HttpUrl;
@@ -36,6 +37,7 @@ public final class LinkBrowser extends LinkLauncherListenable {
     this(DESKTOP_WITH_BROWSER_SUPPORT.get());
   }
 
+  @VisibleForTesting
   LinkBrowser(Desktop desktop) {
     this.desktop = desktop;
   }

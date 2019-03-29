@@ -1,5 +1,6 @@
 package eu.goodlike.sub.box.app.launch;
 
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Suppliers;
 import eu.goodlike.sub.box.util.require.Require;
 import okhttp3.HttpUrl;
@@ -36,6 +37,7 @@ public final class LinkPaste extends LinkLauncherListenable {
     this(SYSTEM_CLIPBOARD.get());
   }
 
+  @VisibleForTesting
   LinkPaste(Clipboard clipboard) {
     this.clipboard = clipboard;
   }
