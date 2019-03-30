@@ -196,6 +196,7 @@ public class CmdApplicationTest {
 
     input(false, "v=mNwgepMSn5E");
 
+    mocksCalled.ui().printItem("Selected video", osuVideoViaLookup);
     Mockito.verify(mocksCalled.getLauncherListener()).onUnsupported(LinkLauncherType.OTHER, osuVideoViaLookup.getUrl());
     mocksCalled.launched(osuVideoViaLookup.getUrl(), true, true);
   }
@@ -270,6 +271,13 @@ public class CmdApplicationTest {
         "channel Deleted after playlist lookup",
         e -> e.isInstanceOf(YoutubeWarningException.class).hasMessageContaining("404")
     );
+  }
+
+  @Test
+  public void selectSearchResultBeforeSearching() {
+    input("cn=1");
+
+    mocksCalled.ui().signalNoPreviousChannelSearch();
   }
 
   @Test
@@ -360,6 +368,13 @@ public class CmdApplicationTest {
     mocksCalled.ui().printItem("Uploaded video 1", osuVideoFromPlaylist);
 
     mocksCalled.ui().signalTooLargePosition(1);
+  }
+
+  @Test
+  public void selectVideoFromPlaylistBeforeSelectingPlaylist() {
+    input("vn=1");
+
+    mocksCalled.ui().signalNoPreviousPlaylist();
   }
 
   private void input(String... input) {
