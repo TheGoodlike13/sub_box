@@ -5,7 +5,6 @@ import okhttp3.HttpUrl;
 
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
-import java.util.function.Consumer;
 
 import static eu.goodlike.sub.box.util.require.Require.titled;
 
@@ -49,9 +48,5 @@ abstract class LinkLauncherListenable implements LinkLauncher, LinkLauncherListe
   }
 
   private final List<LinkLauncherListener> listeners = new CopyOnWriteArrayList<>();
-
-  private void onEvent(Consumer<LinkLauncherListener> event) {
-    listeners.forEach(event);
-  }
 
 }
